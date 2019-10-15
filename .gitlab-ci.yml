@@ -22,6 +22,6 @@ maven-build:
 docker-build:
   stage: package
   script:
-  - docker build -t docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service .
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker-hub.informatik.haw-hamburg.de
+  - docker build -t docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service .
   - docker push docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service
