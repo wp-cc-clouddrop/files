@@ -4,6 +4,7 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay
+  DOCKER_TLS_CERTDIR: ""
   SPRING_PROFILES_ACTIVE: gitlab-ci
 
 stages:
