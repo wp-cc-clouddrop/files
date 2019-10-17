@@ -12,16 +12,13 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 
-public class ClouddropFiles {
+public class ClouddropFiles implements IAdapter {
 
-    /*Konstanten*/
     public static final String STORAGE_CONNECTION_STRING ="DefaultEndpointsProtocol=https;AccountName=clouddropstorage;AccountKey=mwV05Y6DmcWrxgklGsDbqp1HyOHO4gOiYJMfD4KUKOIOlRiS/sSP4lD3Z4FhDkzFm0RRXDTlczcwXDyfPFPE9A==";
-    /*Exemplarvariablen*/
+    
     private CloudStorageAccount _storageAccount;
     private CloudBlobClient _blobClient;
     private CloudBlobContainer _blobContainer;
-
-    /*Konstruktor*/
 
     /**
      * Initialisierung von ClouddropFiles.
@@ -48,58 +45,36 @@ public class ClouddropFiles {
         }
     }
 
-    /*Methoden*/
-    /**
-     *
-     * @return
-     */
-    public String ladeDateiHoch(){
-        return "";
+    @Override
+    public String ladeDateiHoch() {
+        return null;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String aktualisiereDatei(){
-        return "";
+    @Override
+    public String aktualisiereDatei() {
+        return null;
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
-    public String gibDatei(Long id){
-        return "";
+    @Override
+    public String gibDatei(Long id) {
+        return null;
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
-    public String loescheDatei(Long id){
-        return "";
+    @Override
+    public String loescheDatei(Long id) {
+        return null;
     }
 
-    /**
-     *
-     * @return
-     */
-    public String gibListeVonDateien(){
-        return "";
+    @Override
+    public String gibListeVonDateien() {
+        return null;
     }
 
-    /**
-     *
-     * @param dateiName
-     * @param typ
-     * @param datum
-     * @return
-     */
-    public String sucheDatei(String dateiName, String typ, String datum){
-        return "";
+    @Override
+    public String sucheDatei(String dateiName, String typ, String datum) {
+        return null;
     }
+
+
 
 }
