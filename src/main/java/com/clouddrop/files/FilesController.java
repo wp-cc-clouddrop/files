@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FilesController {
 
+    //ClouddropFiles clouddropFiles = new ClouddropFiles(BlobClientProvider.getBlobClientReference());
+
     @PostMapping("/files")
     public String uploadFile() {
         return "POST to /files";
@@ -56,4 +58,5 @@ public class FilesController {
         }
         return answer;
     }
+
 }
