@@ -19,7 +19,7 @@ public interface IAdapter {
      * @param id
      * @return
      */
-    public String gibDatei(Long id);
+    public String ladeDateiHerunter(Long id);
 
     /**
      * Loesche eine Datei
