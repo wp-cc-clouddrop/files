@@ -1,46 +1,14 @@
 package com.clouddrop.files;
 
+import java.io.File;
+
 public interface IAdapter {
 
-    /**
-     * Lade eine Datei hoch
-     * @return
-     */
-    public String ladeDateiHoch();
-
-    /**
-     * Aktualisiere eine Datei
-     * @return
-     */
-    public String aktualisiereDatei();
-
-    /**
-     * Gib eine Datei an
-     * @param id
-     * @return
-     */
-    public String ladeDateiHerunter(Long id);
-
-    /**
-     * Loesche eine Datei
-     * @param id
-     * @return
-     */
-    public String loescheDatei(Long id);
-
-    /**
-     * Gib eine Liste der Dateien aus.
-     * @return
-     */
-    public String gibListeVonDateien();
-
-    /**
-     * Suche nach einer bestimmten Datei
-     * @param dateiName Dateiname
-     * @param typ Typ
-     * @param datum Datum
-     * @return
-     */
-    public String sucheDatei(String dateiName, String typ, String datum);
+    public String uploadFile(File file);
+    public String updateFile(File file);
+    public String downloadFile(Long id);
+    public String deleteFile(Long id);
+    public String listFiles();
+    public String searchFile(String attribute);
 
 }
