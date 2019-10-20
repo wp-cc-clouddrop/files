@@ -16,8 +16,10 @@ public class FilesAzureStorage implements IFilesAdapter {
     private CloudBlobContainer _blobContainer;
     private CloudBlockBlob _blockBlob;
     private File _sourceFile;
+    private String _containerName;
 
-    public FilesAzureStorage(){
+    public FilesAzureStorage(String containerName){
+        _containerName = containerName;
         connect();
     }
 
@@ -103,7 +105,7 @@ public class FilesAzureStorage implements IFilesAdapter {
     private void connect(){
         try {
             _blobClient = getBlobClientReference();
-            _blobContainer = createContainer(_blobClient, "Container");
+            _blobContainer = createContainer(_blobClient, _containerName);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -119,7 +121,7 @@ public class FilesAzureStorage implements IFilesAdapter {
     public String uploadFile() {
 
         try {
-            _sourceFile = new File("C:/Users/fazel/Desktop/Fisch.jpeg");
+            _sourceFile = new File("Hello.txt");
             //Getting a blob reference
             _blockBlob = _blobContainer.getBlockBlobReference(_sourceFile.getName());
             //Creating blob and uploading file to it
@@ -145,9 +147,9 @@ public class FilesAzureStorage implements IFilesAdapter {
 
     @Override
     public String downloadFile(Long id) {
-       String downloadedBlobPath = String.format("%scopyof-%s", System.getProperty("java.io.tmpdir"), _blockBlob.getName());
+       //String downloadedBlobPath = String.format("%scopyof-%s", System.getProperty("java.io.tmpdir"), _blockBlob.getName());
         try {
-            _blockBlob.downloadToFile(downloadedBlobPath);
+            _blockBlob.downloadToFile(_blockBlob.getName());
         } catch (StorageException e) {
             e.printStackTrace();
         } catch (IOException e) {
