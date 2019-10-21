@@ -7,6 +7,7 @@ import com.microsoft.azure.storage.blob.*;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
 
@@ -18,9 +19,10 @@ public class FilesAzureStorage implements IFilesAdapter {
     private CloudBlockBlob _blockBlob;
     private File _sourceFile;
     private String _containerName;
+    private byte[] buffer;
 
     public FilesAzureStorage(){
-
+        //buffer = new byte[0];
     }
 
     /**
@@ -106,6 +108,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         try {
             _blobClient = getBlobClientReference();
             _blobContainer = createContainer(_blobClient, _containerName);
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -121,11 +124,23 @@ public class FilesAzureStorage implements IFilesAdapter {
     public String uploadFile(String userName,String pathname) {
 
         try {
+            HashMap<String,String> metaDaten = new HashMap<String,String>();
+
+            String prefix = ".";
+            int pathIndex = pathname.indexOf(prefix);
+            metaDaten.put("Type",pathname.substring(pathIndex,pathname.length()-1));
+
+            metaDaten.put("Username",userName);
+            metaDaten.put("Pfadname",pathname);
+            //TODO Metadaten hinzufügen
             _sourceFile = new File(pathname);
             //Getting a blob reference
-            _blockBlob = _blobContainer.getBlockBlobReference(userName+_sourceFile.getName());
+            _blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+_sourceFile.getName());
             //Creating blob and uploading file to it
             _blockBlob.uploadFromFile(_sourceFile.getAbsolutePath());
+            for(String s : _blockBlob.getMetadata().keySet()){
+                System.out.println(s);
+            }
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (StorageException e) {
@@ -143,10 +158,11 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String downloadFile(Long id) {
+    public String downloadFile(String userName, String filePathName) {
        //String downloadedBlobPath = String.format("%scopyof-%s", System.getProperty("java.io.tmpdir"), _blockBlob.getName());
         try {
-            _blockBlob.downloadToFile(_blockBlob.getName());
+            //_blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+filePathName);
+            _blockBlob.downloadToFile(userName+"-"+filePathName);
         } catch (StorageException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -156,20 +172,27 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String deleteFile(Long id) {
+    public String deleteFile(String userName, String filePathName) {
         try {
+
+            _blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+filePathName);
             _blockBlob.delete();
         } catch (StorageException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return null;
     }
 
     @Override
-    public String listFiles() {
-        for(ListBlobItem blobItem: _blobContainer.listBlobs()){
+    public String listFiles(String userName) {
+        for(ListBlobItem blobItem: _blobContainer.listBlobs(userName)){
             if(blobItem instanceof CloudBlob){
-                System.out.println(String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), blobItem.getUri().toString()));
+                String path = blobItem.getUri().getPath();
+                String prefix = "/"+userName+"-";
+                int pathIndex = path.indexOf(prefix);
+                System.out.println(String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), path.substring(pathIndex+prefix.length())));
             }
         }
         return null;
