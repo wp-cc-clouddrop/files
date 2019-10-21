@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.Properties;
+import java.util.Random;
 
 public class FilesAzureStorage implements IFilesAdapter {
 
@@ -18,9 +19,8 @@ public class FilesAzureStorage implements IFilesAdapter {
     private File _sourceFile;
     private String _containerName;
 
-    public FilesAzureStorage(String containerName){
-        _containerName = containerName;
-        connect();
+    public FilesAzureStorage(){
+
     }
 
     /**
@@ -90,7 +90,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         CloudBlobContainer container = blobClient.getContainerReference(containerName);
         try {
             if (!container.createIfNotExists()) {
-                throw new IllegalStateException(String.format("Container with name \"%s\" already exists.", containerName));
+                //throw new IllegalStateException(String.format("Container with name \"%s\" already exists.", containerName));
             }
         }
         catch (StorageException s) {
@@ -102,7 +102,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         return container;
     }
 
-    private void connect(){
+    public void connect(){
         try {
             _blobClient = getBlobClientReference();
             _blobContainer = createContainer(_blobClient, _containerName);
@@ -118,12 +118,12 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String uploadFile() {
+    public String uploadFile(String userName,String pathname) {
 
         try {
-            _sourceFile = new File("Hello.txt");
+            _sourceFile = new File(pathname);
             //Getting a blob reference
-            _blockBlob = _blobContainer.getBlockBlobReference(_sourceFile.getName());
+            _blockBlob = _blobContainer.getBlockBlobReference(userName+_sourceFile.getName());
             //Creating blob and uploading file to it
             _blockBlob.uploadFromFile(_sourceFile.getAbsolutePath());
         } catch (URISyntaxException e) {
@@ -137,11 +137,8 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String updateFile(String filename) {
-        // im Storage gucken, ob es den File gibt
-        // wenn ja, dann aktualisieren
-        // wenn nein, uploaden
-        //TODO
+    public String updateFile(String userName, String filename) {
+        uploadFile(userName,filename);
         return null;
     }
 
@@ -190,4 +187,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         return null;
     }
 
+    public void setContainerName(String containerName) {
+        _containerName = containerName;
+    }
 }
