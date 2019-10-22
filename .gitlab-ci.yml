@@ -1,6 +1,6 @@
-image: docker:19.03.0
+image: docker:19.03.1
 services:
-  - docker:19.03.0-dind
+  - docker:19.03.1-dind
 
 variables:
   DOCKER_DRIVER: overlay
