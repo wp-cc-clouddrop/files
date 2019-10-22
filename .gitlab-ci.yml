@@ -30,6 +30,7 @@ docker-build:
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker-hub.informatik.haw-hamburg.de
   - docker build -t docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service .
   - docker push docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service
+  tags: [dind, docker]
 
 trigger-deploy:
   stage: deploy
