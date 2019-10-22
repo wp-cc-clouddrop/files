@@ -10,6 +10,8 @@ import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;    
 
 public class FilesAzureStorage implements IFilesAdapter {
 
@@ -125,19 +127,27 @@ public class FilesAzureStorage implements IFilesAdapter {
 
         try {
             HashMap<String,String> metaDaten = new HashMap<String,String>();
-
-            String prefix = ".";
-            int pathIndex = pathname.indexOf(prefix);
-            metaDaten.put("Type",pathname.substring(pathIndex,pathname.length()-1));
-
+                      
+            //add user and pathname 
             metaDaten.put("Username",userName);
             metaDaten.put("Pfadname",pathname);
-            //TODO Metadaten hinzufügen
+            
+            //add type
+            String prefix = ".";
+            int pathIndex = pathname.lastIndexOf(prefix);
+            metaDaten.put("Type",pathname.substring(pathIndex));
+            
+            //add last modified
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+            LocalDateTime now = LocalDateTime.now();  
+            metaDaten.put("Datum", dtf.format(now));
+            
             _sourceFile = new File(pathname);
             //Getting a blob reference
             _blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+_sourceFile.getName());
             //Creating blob and uploading file to it
             _blockBlob.uploadFromFile(_sourceFile.getAbsolutePath());
+            _blockBlob.setMetadata(metaDaten);
             for(String s : _blockBlob.getMetadata().keySet()){
                 System.out.println(s);
             }
@@ -196,16 +206,24 @@ public class FilesAzureStorage implements IFilesAdapter {
             }
         }
         return null;
+        
     }
-
+    
     @Override
     public String searchFile(String attribute) {
         switch (attribute){
+        	
             case "Name": System.out.println("TODO!");
+            	_blockBlob a = _blobContainer.getBlockBlobReference(attribute);
+            break;
+            	
             case "Type": System.out.println("TODO!");
+            break; 
             case "Datum": System.out.println("TODO!");
+            break; 
             default:
                 System.out.println("Fehler");
+            break; 
         }
         return null;
     }
