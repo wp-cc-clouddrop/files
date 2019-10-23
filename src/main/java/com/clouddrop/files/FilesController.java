@@ -84,32 +84,29 @@ public class FilesController {
     public Map<String, Object> getListFiles(@PathVariable("userName") String userName) {
         ObjectMapper om = new ObjectMapper();
         List<String> liste = fas.listFiles(userName);
-        JsonNode blobArray = om.valueToTree(liste);
         Map<String,Object> map = new HashMap<>();
-        map.put("list",blobArray);
+        map.put("list",liste);
         map.put("username",userName);
         return map;
     }
 
     @GetMapping("/files/list/search/{userName}")
-    public String searchFiles(@PathVariable("userName") String userName,
+    public Map<String, Object> searchFiles(@PathVariable("userName") String userName,
                               @RequestParam(value = "filename", required = false) String filename,
                               @RequestParam(value = "type", required = false) String type,
                               @RequestParam(value = "dateModified", required = false) String dateModified) {
-        String answer = "GET to /files/list/search with params";
+        //String answer = "GET to /files/list/search with params";
+        ObjectMapper om = new ObjectMapper();
+        List<String> liste = fas.searchFile(userName,filename,type,dateModified);
 
-        // check if request param set
-        if (filename != null) {
-            answer += " filename = " + filename;
-        }
-        if (type != null) {
-            answer += " type = " + type;
-        }
-        if (dateModified != null) {
-            answer += " dateModified = " + dateModified;
-        }
-
-        return answer;
+        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> mapParam = new HashMap<>();
+        mapParam.put("filename",filename);
+        mapParam.put("type",type);
+        mapParam.put("lastModified",dateModified);
+        map.put("owner",userName);
+        map.put("searchedParam",mapParam);
+        map.put("result",liste);
+        return map;
     }
-
 }

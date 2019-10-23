@@ -17,6 +17,6 @@ public interface IFilesAdapter {
     public String downloadFile(String userName, String filePathName);
     public String deleteFile(String userName, String filePathName);
     public List<String> listFiles(String userName);
-    public List<String> searchFile(String userName, String name, String type, String date);
+    public List<String> searchFile(final String userName, final String name, final String type, final String date);
 
 }

@@ -226,7 +226,7 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public List<String> searchFile(String userName,String name, String typ, String date){
+    public List<String> searchFile(final String userName,final String name, final String typ, final String date){
         List<String> results = new ArrayList<>();
         if(name == null && typ == null && date == null){
             return listFiles(userName);
