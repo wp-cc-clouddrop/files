@@ -1,9 +1,16 @@
 package com.clouddrop.files;
 
-import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public interface IFilesAdapter {
+
+    /**
+     * Upload blob/object metadata to container/bucket.
+     *
+     * @param metadata
+     */
+    public void uploadMetadata(HashMap<String, String> metadata);
 
     public String uploadFile(String userName, String filePathname);
     public String updateFile(String userName, String filePathName);

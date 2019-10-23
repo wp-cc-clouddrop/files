@@ -41,6 +41,7 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Provide @Entity annotation -->
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>

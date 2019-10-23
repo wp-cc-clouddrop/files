@@ -5,19 +5,15 @@ import com.microsoft.azure.storage.blob.*;
 
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.*;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;    
 
 public class FilesAzureStorage implements IFilesAdapter {
 
     private CloudStorageAccount _storageAccount;
     private CloudBlobClient _blobClient;
     private CloudBlobContainer _blobContainer;
-    private CloudBlockBlob _blockBlob;
 
     private String _containerName;
     private byte[] buffer;
@@ -122,34 +118,37 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
+    public void uploadMetadata(HashMap<String, String> metadata) {
+        try {
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(metadata.get("owner") + "-" + metadata.get("filename"));
+            uploadEmptyBlob(blob);
+
+            blob.setMetadata(metadata);
+            blob.uploadMetadata();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void uploadEmptyBlob(CloudBlockBlob blob) throws StorageException, IOException {
+        byte[] empty = new byte[0];
+        blob.uploadFromByteArray(empty, 0, 0);
+    }
+
+    @Override
     public String uploadFile(String userName,String pathname) {
 
         try {
-            HashMap<String,String> metaDaten = new HashMap<String,String>();
             File localFile = new File(pathname);
-            //add user and pathname 
-            metaDaten.put("Username",userName);
-            metaDaten.put("Dateiname",localFile.getName());
-            
-            //add type
-            String prefix = ".";
-            int pathIndex = pathname.lastIndexOf(prefix);
-            metaDaten.put("Type",pathname.substring(pathIndex));
-            
-            //add last modified
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-            LocalDateTime now = LocalDateTime.now();  
-            metaDaten.put("Datum", dtf.format(now));
-            
+
             //Getting a blob reference
-            _blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+localFile.getName());
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(userName+"-"+localFile.getName());
             //Creating blob and uploading file to it
-            _blockBlob.uploadFromFile(localFile.getAbsolutePath());
-            _blockBlob.setMetadata(metaDaten);
-            _blockBlob.uploadMetadata();
-            for(String s : _blockBlob.getMetadata().keySet()){
-                System.out.println("Key:"+s+"-"+"Value:"+metaDaten.get(s));
-            }
+            blob.uploadFromFile(localFile.getAbsolutePath());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (StorageException e) {
@@ -179,11 +178,15 @@ public class FilesAzureStorage implements IFilesAdapter {
 
     @Override
     public String downloadFile(String userName, String filePathName) {
+        File localFile = new File(filePathName);
         try {
-            _blockBlob.downloadToFile(userName+"-"+filePathName);
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(userName+"-"+localFile.getName());
+            blob.downloadToFile(userName+"-"+filePathName);
         } catch (StorageException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
             e.printStackTrace();
         }
         return null;
@@ -192,8 +195,8 @@ public class FilesAzureStorage implements IFilesAdapter {
     @Override
     public String deleteFile(String userName, String filePathName) {
         try {
-            _blockBlob = _blobContainer.getBlockBlobReference(userName+"-"+filePathName);
-            if(!_blockBlob.deleteIfExists()){
+            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(userName+"-"+filePathName);
+            if(!blob.deleteIfExists()){
                 throw new IllegalArgumentException("Man kann keine Datei löschen, die nicht existiert!!!");
             }
         } catch (StorageException e) {
@@ -218,9 +221,9 @@ public class FilesAzureStorage implements IFilesAdapter {
             }
         }
         return results;
-        
+
     }
-    
+
     @Override
     public List<String> searchFile(String userName,String name, String typ, String date){
         List<String> results = new ArrayList<>();

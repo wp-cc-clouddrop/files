@@ -12,17 +12,23 @@ public class Metadata {
     private String type;
     private String lastModified;
     private String contentLocation;
+    private String owner;
 
-    public Metadata() {}
+    public Metadata() {
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
     public Metadata(Metadata resource, String location) {
         this.filename = resource.getFilename();
         this.type = resource.getType();
         this.contentLocation = location;
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        this.lastModified = dtf.format(now);
     }
 
     public String getContentLocation() {
@@ -55,5 +61,11 @@ public class Metadata {
 
     public void setLastModified(String modDate) {
         this.lastModified = modDate;
+    }
+
+    public void updateLastModified() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        this.lastModified = dtf.format(now);
     }
 }
