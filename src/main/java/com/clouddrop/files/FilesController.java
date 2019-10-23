@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
@@ -60,9 +62,18 @@ public class FilesController {
         return resource;
     }
 
-    @PostMapping("/files/{location}")
-    public String uploadFile(@PathVariable("location") String location) {
-        return "POST to /files/" + location;
+    @RequestMapping(path = "/files/{owner}/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateFile(@PathVariable("owner") String owner, @PathVariable("filename") String filename,
+            @RequestParam("file") MultipartFile file, HttpServletResponse response) {
+        try {
+            if (!fas.updateFile(owner, filename, file.getBytes())) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/files")

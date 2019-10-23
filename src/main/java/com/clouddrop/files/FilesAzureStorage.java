@@ -3,13 +3,19 @@ package com.clouddrop.files;
 import com.microsoft.azure.storage.*;
 import com.microsoft.azure.storage.blob.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class FilesAzureStorage implements IFilesAdapter {
+
+    private static Logger log = LoggerFactory.getLogger(FilesAzureStorage.class);
 
     private CloudStorageAccount _storageAccount;
     private CloudBlobClient _blobClient;
@@ -140,15 +146,25 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String uploadFile(String userName,String pathname) {
+    public boolean updateFile(String owner, String filename, byte[] buffer) {
 
         try {
-            File localFile = new File(pathname);
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(owner+"-"+filename);
+            if (!blob.exists()) {
+                log.error("File does not exist. owner: " + owner + " filename: " + filename, new Exception());
+                return false;
+            }
 
-            //Getting a blob reference
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(userName+"-"+localFile.getName());
-            //Creating blob and uploading file to it
-            blob.uploadFromFile(localFile.getAbsolutePath());
+            blob.downloadAttributes();
+            HashMap<String, String> metadata = blob.getMetadata();
+            blob.uploadFromByteArray(buffer, 0, buffer.length);
+
+            // Update lastModified
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            metadata.put("lastModified", dtf.format(now));
+            blob.setMetadata(metadata);
+            blob.uploadMetadata();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (StorageException e) {
@@ -156,24 +172,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         }catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    @Override
-    public String updateFile(String userName, String filename) {
-        try {
-            File localFile = new File(filename);
-            if(_blobContainer.getBlockBlobReference(userName+"-"+localFile.getName()).exists()){
-                uploadFile(userName,filename);
-            }else{
-                throw new IllegalArgumentException("Fail! Man kann keine Datei, die noch nicht existiert, updaten!!");
-            }
-        } catch (StorageException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return true;
     }
 
     @Override

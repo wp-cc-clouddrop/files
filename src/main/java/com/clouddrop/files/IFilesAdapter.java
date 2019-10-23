@@ -12,8 +12,15 @@ public interface IFilesAdapter {
      */
     public void uploadMetadata(HashMap<String, String> metadata);
 
-    public String uploadFile(String userName, String filePathname);
-    public String updateFile(String userName, String filePathName);
+    /**
+     * Update file in cloud storage.
+     *
+     * @param owner Username of owner
+     * @param data  File to update in bytes array
+     * @return true if successfull. False otherwise.
+     */
+    public boolean updateFile(String owner, String filename, byte[] data);
+
     public String downloadFile(String userName, String filePathName);
     public String deleteFile(String userName, String filePathName);
     public List<String> listFiles(String userName);
