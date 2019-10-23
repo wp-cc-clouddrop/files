@@ -2,6 +2,10 @@ package com.clouddrop.files;
 
 import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.microsoft.azure.storage.StorageException;
 
@@ -14,9 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.json.Json;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -73,13 +80,20 @@ public class FilesController {
         return "DELETE to /files/" + id;
     }
 
-    @GetMapping("/files/list")
-    public String getListFiles() {
-        return "GET to /files/list";
+    @GetMapping("/files/list/{userName}")
+    public Map<String, Object> getListFiles(@PathVariable("userName") String userName) {
+        ObjectMapper om = new ObjectMapper();
+        List<String> liste = fas.listFiles(userName);
+        JsonNode blobArray = om.valueToTree(liste);
+        Map<String,Object> map = new HashMap<>();
+        map.put("list",blobArray);
+        map.put("username",userName);
+        return map;
     }
 
-    @GetMapping("/files/list/search")
-    public String searchFiles(@RequestParam(value = "filename", required = false) String filename,
+    @GetMapping("/files/list/search/{userName}")
+    public String searchFiles(@PathVariable("userName") String userName,
+                              @RequestParam(value = "filename", required = false) String filename,
                               @RequestParam(value = "type", required = false) String type,
                               @RequestParam(value = "dateModified", required = false) String dateModified) {
         String answer = "GET to /files/list/search with params";

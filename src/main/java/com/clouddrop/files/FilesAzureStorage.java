@@ -215,9 +215,10 @@ public class FilesAzureStorage implements IFilesAdapter {
                 String path = blobItem.getUri().getPath();
                 String prefix = "/"+userName+"-";
                 int pathIndex = path.indexOf(prefix);
-                String s = String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), path.substring(pathIndex+prefix.length()));
+                //String s = String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), path.substring(pathIndex+prefix.length()));
+                String s = String.format("%s", (path.substring(pathIndex+prefix.length())));
                 results.add(s);
-                System.out.println(s);
+                //System.out.println(s);
             }
         }
         return results;
