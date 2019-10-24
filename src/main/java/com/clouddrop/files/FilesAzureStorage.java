@@ -221,7 +221,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         try {
             CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(username, filePathName));
             if(!blob.deleteIfExists()){
-                throw new IllegalArgumentException("Man kann keine Datei löschen, die nicht existiert!!!");
+                throw new IllegalArgumentException("AZURE ERRROR: Man kann keine Datei löschen, die nicht existiert!!!");
             }
         } catch (StorageException e) {
             e.printStackTrace();

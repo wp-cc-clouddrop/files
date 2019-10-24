@@ -56,7 +56,7 @@ public class FilesController {
     }
 
     @RequestMapping(path = "/files/{username}/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateFile(@PathVariable("username") String username, @PathVariable("filename") String filename,
             @RequestParam("file") MultipartFile file, HttpServletResponse response) {
         try {
@@ -70,6 +70,7 @@ public class FilesController {
     }
 
     @GetMapping(path = "/files/{filename}", produces = "multipart/form-data")
+    @ResponseStatus(HttpStatus.OK)
     public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response) {
         // TODO: get username/username from auth header
         String username = TEST_USERNAME;
@@ -82,12 +83,14 @@ public class FilesController {
         return data;
     }
 
-    @DeleteMapping("/files/{filename}")
-    public String deleteFile(@PathVariable("id") Long id) {
+    @DeleteMapping(path = "/files/{filename}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFile(@PathVariable("filename") String filename) {
         return "DELETE to /files/" + id;
     }
 
     @GetMapping("/files/list/{userName}")
+    @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> getListFiles(@PathVariable("userName") String userName) {
         List<String> liste = fas.listFiles(userName);
         Map<String,Object> map = new HashMap<>();
@@ -97,6 +100,7 @@ public class FilesController {
     }
 
     @GetMapping("/files/list/search/{userName}")
+    @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> searchFiles(@PathVariable("userName") String userName,
                               @RequestParam(value = "filename", required = false) String filename,
                               @RequestParam(value = "type", required = false) String type,
