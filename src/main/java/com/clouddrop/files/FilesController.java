@@ -2,30 +2,22 @@ package com.clouddrop.files;
 
 import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import com.microsoft.azure.storage.StorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.InvalidKeyException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.Json;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -76,17 +68,20 @@ public class FilesController {
         }
     }
 
-    @PutMapping("/files")
-    public String updateFile() {
-        return "PUT to /files";
+    @GetMapping(path = "/files/{filename}", produces = "multipart/form-data")
+    public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response) {
+        // TODO: get username/username from auth header
+        String username = "testUser";
+
+        byte[] data = fas.downloadFile(username, filename);
+        if (data == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return data;
     }
 
-    @GetMapping("/files/{fileName}")
-    public String getFile(@PathVariable("fileName") String fileName) {
-        return "GET to /files/" + fileName;
-    }
-
-    @DeleteMapping("/files/{id}")
+    @DeleteMapping("/files/{filename}")
     public String deleteFile(@PathVariable("id") Long id) {
         return "DELETE to /files/" + id;
     }

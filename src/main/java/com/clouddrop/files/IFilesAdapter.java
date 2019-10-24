@@ -15,20 +15,20 @@ public interface IFilesAdapter {
     /**
      * Update file in cloud storage.
      *
-     * @param owner Username of owner
+     * @param username file owner
      * @param data  File to update in bytes array
      * @return true if successfull. False otherwise.
      */
-    public boolean updateFile(String owner, String filename, byte[] data);
+    public boolean updateFile(String username, String filename, byte[] data);
 
     /**
      * Downloads file from cloud storage
      *
-     * @param userName owner of the file
+     * @param userName file owner
      * @param filename name of the file
-     * @param data     returned data in bytes
+     * @return downloaded data in bytes
      */
-    public boolean downloadFile(String userName, String filename, byte[] data);
+    public byte[] downloadFile(String userName, String filename);
 
     public String deleteFile(String userName, String filePathName);
     public List<String> listFiles(String userName);

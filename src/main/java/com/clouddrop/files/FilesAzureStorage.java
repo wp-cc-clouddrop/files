@@ -22,7 +22,6 @@ public class FilesAzureStorage implements IFilesAdapter {
     private CloudBlobContainer _blobContainer;
 
     private String _containerName;
-    private byte[] buffer;
 
     public FilesAzureStorage() {
         // buffer = new byte[0];
@@ -152,7 +151,7 @@ public class FilesAzureStorage implements IFilesAdapter {
     public boolean updateFile(String owner, String filename, byte[] buffer) {
 
         try {
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(owner+"-"+filename);
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(owner, filename));
             if (!blob.exists()) {
                 log.error("File does not exist. owner: " + owner + " filename: " + filename, new Exception());
                 return false;
@@ -172,21 +171,38 @@ public class FilesAzureStorage implements IFilesAdapter {
             e.printStackTrace();
         } catch (StorageException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return true;
     }
 
     @Override
-    public String downloadFile(String userName, String filePathName) {
-        File localFile = new File(filePathName);
+    public byte[] downloadFile(String userName, String filename) {
         try {
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(userName+"-"+localFile.getName());
-            blob.downloadToFile(userName+"-"+filePathName);
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(userName, filename));
+            if (!blob.exists()) {
+                log.debug("Blob does not exists");
+                return null;
+            }
+
+            int expected = Math.toIntExact(blob.getProperties().getLength());
+            byte[] data = new byte[expected];
+
+            // check if we received whole file already
+            // if not, redownload until whole file is received
+            int received = blob.downloadToByteArray(data, 0);
+            while (received < expected) {
+                expected -= received;
+                if (expected < 0) {
+                    return null;
+                }
+
+                received = blob.downloadToByteArray(data, received);
+            }
+
+            return data;
         } catch (StorageException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -194,10 +210,14 @@ public class FilesAzureStorage implements IFilesAdapter {
         return null;
     }
 
+    private String getBlobName(String userName, String filename) {
+        return userName+"-"+filename;
+    }
+
     @Override
     public String deleteFile(String userName, String filePathName) {
         try {
-            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(userName+"-"+filePathName);
+            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(userName, filePathName));
             if(!blob.deleteIfExists()){
                 throw new IllegalArgumentException("Man kann keine Datei löschen, die nicht existiert!!!");
             }
