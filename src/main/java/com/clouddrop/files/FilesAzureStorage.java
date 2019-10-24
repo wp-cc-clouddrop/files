@@ -178,11 +178,11 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public byte[] downloadFile(String userName, String filename) {
+    public byte[] downloadFile(String username, String filename) {
         try {
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(userName, filename));
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(username, filename));
             if (!blob.exists()) {
-                log.error("AZURE ERROR: Blob does not exists: username: " + userName + "; filename : " + filename);
+                log.error("AZURE ERROR: Blob does not exists: username: " + username + "; filename : " + filename);
                 return null;
             }
 
@@ -212,14 +212,14 @@ public class FilesAzureStorage implements IFilesAdapter {
         return null;
     }
 
-    private String getBlobName(String userName, String filename) {
-        return userName + "-" + filename;
+    private String getBlobName(String username, String filename) {
+        return username + "-" + filename;
     }
 
     @Override
-    public String deleteFile(String userName, String filePathName) {
+    public String deleteFile(String username, String filePathName) {
         try {
-            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(userName, filePathName));
+            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(username, filePathName));
             if(!blob.deleteIfExists()){
                 throw new IllegalArgumentException("Man kann keine Datei löschen, die nicht existiert!!!");
             }
@@ -232,12 +232,12 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public List<String> listFiles(String userName) {
+    public List<String> listFiles(String username) {
         List<String> results = new ArrayList<>();
-        for(ListBlobItem blobItem: _blobContainer.listBlobs(userName)){
+        for(ListBlobItem blobItem: _blobContainer.listBlobs(username)){
             if(blobItem instanceof CloudBlob){
                 String path = blobItem.getUri().getPath();
-                String prefix = "/"+userName+"-";
+                String prefix = "/"+username+"-";
                 int pathIndex = path.indexOf(prefix);
                 //String s = String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), path.substring(pathIndex+prefix.length()));
                 String s = String.format("%s", (path.substring(pathIndex+prefix.length())));
@@ -250,12 +250,12 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public List<String> searchFile(final String userName,final String name, final String typ, final String date){
+    public List<String> searchFile(final String username,final String name, final String typ, final String date){
         List<String> results = new ArrayList<>();
         if(name == null && typ == null && date == null){
-            return listFiles(userName);
+            return listFiles(username);
         }
-        for(ListBlobItem blobItem : _blobContainer.listBlobs(userName)){
+        for(ListBlobItem blobItem : _blobContainer.listBlobs(username)){
             HashMap<String,String> metaData;
             if(blobItem instanceof CloudBlob){
                 try {
