@@ -100,7 +100,6 @@ public class FilesController {
                               @RequestParam(value = "type", required = false) String type,
                               @RequestParam(value = "dateModified", required = false) String dateModified) {
         //String answer = "GET to /files/list/search with params";
-        ObjectMapper om = new ObjectMapper();
         List<String> liste = fas.searchFile(userName,filename,type,dateModified);
 
         Map<String,Object> map = new HashMap<>();
