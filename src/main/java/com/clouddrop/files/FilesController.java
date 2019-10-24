@@ -2,7 +2,6 @@ package com.clouddrop.files;
 
 import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
