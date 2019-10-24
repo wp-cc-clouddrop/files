@@ -4,7 +4,6 @@ import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.microsoft.azure.storage.StorageException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,6 @@ public class FilesController {
 
     @GetMapping("/files/list/{userName}")
     public Map<String, Object> getListFiles(@PathVariable("userName") String userName) {
-        ObjectMapper om = new ObjectMapper();
         List<String> liste = fas.listFiles(userName);
         Map<String,Object> map = new HashMap<>();
         map.put("list",liste);
