@@ -26,8 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class FilesController {
 
-    private static final String TEST_USERNAME = "testUsername";
-
     private static Logger log = LoggerFactory.getLogger(FilesController.class);
 
     private FilesAzureStorage fas;
@@ -86,7 +84,7 @@ public class FilesController {
         }
         resource.setUsername(username);
 
-        String location = "/files/" + username + "/" + resource.getFilename();
+        String location = "/files/" + resource.getFilename();
         resource.updateLastModified();
         resource.setContentLocation(location);
         fas.uploadMetadata(service.toMap(resource));
@@ -110,9 +108,10 @@ public class FilesController {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
     }
 
@@ -157,9 +156,9 @@ public class FilesController {
         }
     }
 
-    @GetMapping("/files/list/{userName}")
+    @GetMapping("/files/list")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> getListFiles(@PathVariable("userName") String userName,@RequestHeader("Authorization") String auth) {
+    public Map<String, Object> getListFiles(@RequestHeader("Authorization") String auth) {
 
         String username = null;
         try {
@@ -171,20 +170,19 @@ public class FilesController {
             e.printStackTrace();
         }
 
-        List<String> liste = fas.listFiles(userName);
+        List<String> liste = fas.listFiles(username);
         Map<String,Object> map = new HashMap<>();
         map.put("list",liste);
-        map.put("username",userName);
+        map.put("username",username);
         return map;
     }
 
-    @GetMapping("/files/list/search/{userName}")
+    @GetMapping("/files/list/search")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> searchFiles(@PathVariable("userName") String userName,
-                              @RequestParam(value = "filename", required = false) String filename,
-                              @RequestParam(value = "type", required = false) String type,
-                              @RequestParam(value = "dateModified", required = false) String dateModified,
-                                           @RequestHeader("Authorization") String auth) {
+    public Map<String, Object> searchFiles(@RequestHeader("Authorization") String auth,
+                            @RequestParam(value = "filename", required = false) String filename,
+                            @RequestParam(value = "type", required = false) String type,
+                            @RequestParam(value = "dateModified", required = false) String dateModified) {
 
         String username = null;
         try {
@@ -196,14 +194,14 @@ public class FilesController {
             e.printStackTrace();
         }
 
-        List<String> liste = fas.searchFile(userName,filename,type,dateModified);
+        List<String> liste = fas.searchFile(username,filename,type,dateModified);
 
         Map<String,Object> map = new HashMap<>();
         Map<String,Object> mapParam = new HashMap<>();
         mapParam.put("filename",filename);
         mapParam.put("type",type);
         mapParam.put("lastModified",dateModified);
-        map.put("username",userName);
+        map.put("username",username);
         map.put("searchedParam",mapParam);
         map.put("result",liste);
         return map;
