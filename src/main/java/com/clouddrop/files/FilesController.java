@@ -86,7 +86,13 @@ public class FilesController {
     @DeleteMapping(path = "/files/{filename}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFile(@PathVariable("filename") String filename) {
-        return "DELETE to /files/" + id;
+        String username = TEST_USERNAME;
+
+        try {
+            fas.deleteFile(username, filename);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/files/list/{userName}")

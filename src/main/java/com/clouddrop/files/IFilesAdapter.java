@@ -31,12 +31,12 @@ public interface IFilesAdapter {
     public byte[] downloadFile(String username, String filename);
 
     /**
-     * Deletes a file from cloud storage
+     * Checks if file exists and deletes it from the cloud storage
      *
      * @param username
      * @param filePathName
      */
-    public void deleteFile(String username, String filename);
+    public void deleteFile(String username, String filename) throws IllegalArgumentException;
 
     /**
      * List all files that belongs to the user in cloud storage

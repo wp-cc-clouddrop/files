@@ -217,10 +217,11 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public String deleteFile(String username, String filePathName) {
+    public void deleteFile(String username, String filename) throws IllegalArgumentException {
         try {
-            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(username, filePathName));
+            CloudBlockBlob blob =  _blobContainer.getBlockBlobReference(getBlobName(username, filename));
             if(!blob.deleteIfExists()){
+                log.error("AZURE ERROR: file to delete does not exists");
                 throw new IllegalArgumentException("AZURE ERRROR: Man kann keine Datei löschen, die nicht existiert!!!");
             }
         } catch (StorageException e) {
@@ -228,7 +229,6 @@ public class FilesAzureStorage implements IFilesAdapter {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return null;
     }
 
     @Override
