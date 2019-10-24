@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class FilesController {
 
+    private static final String TEST_USERNAME = "testUsername";
+
     private static Logger log = LoggerFactory.getLogger(FilesController.class);
 
     private FilesAzureStorage fas;
@@ -41,7 +43,7 @@ public class FilesController {
         Preconditions.checkNotNull(resource);
 
         // TODO: get this from auth header?
-        String username = "testUsername";
+        String username = TEST_USERNAME;
         resource.setUsername(username);
 
         String location = "/files/" + username + "/" + resource.getFilename();
@@ -70,7 +72,7 @@ public class FilesController {
     @GetMapping(path = "/files/{filename}", produces = "multipart/form-data")
     public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response) {
         // TODO: get username/username from auth header
-        String username = "testUser";
+        String username = TEST_USERNAME;
 
         byte[] data = fas.downloadFile(username, filename);
         if (data == null) {

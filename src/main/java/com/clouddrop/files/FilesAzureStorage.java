@@ -128,7 +128,7 @@ public class FilesAzureStorage implements IFilesAdapter {
     public void uploadMetadata(HashMap<String, String> metadata) {
         try {
             CloudBlockBlob blob = _blobContainer
-                    .getBlockBlobReference(metadata.get("owner") + "-" + metadata.get("filename"));
+                    .getBlockBlobReference(metadata.get("username") + "-" + metadata.get("filename"));
             uploadEmptyBlob(blob);
 
             blob.setMetadata(metadata);
@@ -148,12 +148,12 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public boolean updateFile(String owner, String filename, byte[] buffer) {
+    public boolean updateFile(String username, String filename, byte[] buffer) {
 
         try {
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(owner, filename));
+            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(username, filename));
             if (!blob.exists()) {
-                log.error("File does not exist. owner: " + owner + " filename: " + filename, new Exception());
+                log.error("File does not exist. username: " + username + " filename: " + filename, new Exception());
                 return false;
             }
 
@@ -182,7 +182,7 @@ public class FilesAzureStorage implements IFilesAdapter {
         try {
             CloudBlockBlob blob = _blobContainer.getBlockBlobReference(getBlobName(userName, filename));
             if (!blob.exists()) {
-                log.debug("Blob does not exists");
+                log.error("AZURE ERROR: Blob does not exists: username: " + userName + "; filename : " + filename);
                 return null;
             }
 
@@ -195,6 +195,7 @@ public class FilesAzureStorage implements IFilesAdapter {
             while (received < expected) {
                 expected -= received;
                 if (expected < 0) {
+                    log.error("AZURE ERROR: expected is smaller than received");
                     return null;
                 }
 
@@ -207,11 +208,12 @@ public class FilesAzureStorage implements IFilesAdapter {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
+        log.error("AZURE ERROR: exception while downloading file");
         return null;
     }
 
     private String getBlobName(String userName, String filename) {
-        return userName+"-"+filename;
+        return userName + "-" + filename;
     }
 
     @Override
