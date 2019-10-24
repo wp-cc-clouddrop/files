@@ -24,14 +24,37 @@ public interface IFilesAdapter {
     /**
      * Downloads file from cloud storage
      *
-     * @param userName file owner
+     * @param username file owner
      * @param filename name of the file
      * @return downloaded data in bytes
      */
-    public byte[] downloadFile(String userName, String filename);
+    public byte[] downloadFile(String username, String filename);
 
-    public String deleteFile(String userName, String filePathName);
-    public List<String> listFiles(String userName);
-    public List<String> searchFile(final String userName, final String name, final String type, final String date);
+    /**
+     * Deletes a file from cloud storage
+     *
+     * @param username
+     * @param filePathName
+     */
+    public void deleteFile(String username, String filename);
+
+    /**
+     * List all files that belongs to the user in cloud storage
+     *
+     * @param username
+     * @return List of files
+     */
+    public List<String> listFiles(String username);
+
+    /**
+     * Search files of user in cloud storage with parameters
+     *
+     * @param username
+     * @param name
+     * @param type
+     * @param date
+     * @return List of files
+     */
+    public List<String> searchFile(final String username, final String name, final String type, final String date);
 
 }
