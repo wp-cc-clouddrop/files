@@ -34,7 +34,7 @@ public interface IFilesAdapter {
      * Checks if file exists and deletes it from the cloud storage
      *
      * @param username
-     * @param filePathName
+     * @param filename
      */
     public void deleteFile(String username, String filename) throws IllegalArgumentException;
 
