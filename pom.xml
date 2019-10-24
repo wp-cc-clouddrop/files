@@ -41,6 +41,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Spring Security for JWT token support -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-jwt</artifactId>
+			<version>1.0.11.RELEASE</version>
+		  </dependency>
+
 		<!-- Provide @Entity annotation -->
 		<dependency>
 			<groupId>javax</groupId>
