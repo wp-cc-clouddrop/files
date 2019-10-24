@@ -21,7 +21,15 @@ public interface IFilesAdapter {
      */
     public boolean updateFile(String owner, String filename, byte[] data);
 
-    public String downloadFile(String userName, String filePathName);
+    /**
+     * Downloads file from cloud storage
+     *
+     * @param userName owner of the file
+     * @param filename name of the file
+     * @param data     returned data in bytes
+     */
+    public boolean downloadFile(String userName, String filename, byte[] data);
+
     public String deleteFile(String userName, String filePathName);
     public List<String> listFiles(String userName);
     public List<String> searchFile(final String userName, final String name, final String type, final String date);
