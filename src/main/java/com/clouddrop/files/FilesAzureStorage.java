@@ -24,48 +24,47 @@ public class FilesAzureStorage implements IFilesAdapter {
     private String _containerName;
     private byte[] buffer;
 
-    public FilesAzureStorage(){
-        //buffer = new byte[0];
+    public FilesAzureStorage() {
+        // buffer = new byte[0];
     }
 
     /**
-     * Validates the connection string and returns the storage blob client.
-     * The connection string must be in the Azure connection string format.
+     * Validates the connection string and returns the storage blob client. The
+     * connection string must be in the Azure connection string format.
      *
      * @return The newly created CloudBlobClient object
      *
-     * @throws RuntimeException "runtime failed"
-     * @throws IOException "io failed"
-     * @throws URISyntaxException "Uri has invalid syntax"
+     * @throws RuntimeException         "runtime failed"
+     * @throws IOException              "io failed"
+     * @throws URISyntaxException       "Uri has invalid syntax"
      * @throws IllegalArgumentException "Illegal Argument"
-     * @throws InvalidKeyException "Invalid key"
+     * @throws InvalidKeyException      "Invalid key"
      */
-    public CloudBlobClient getBlobClientReference() throws RuntimeException, IOException, IllegalArgumentException, URISyntaxException, InvalidKeyException {
+    public CloudBlobClient getBlobClientReference()
+            throws RuntimeException, IOException, IllegalArgumentException, URISyntaxException, InvalidKeyException {
 
         // Retrieve the connection string
         Properties prop = new Properties();
         try {
-            InputStream propertyStream = FilesAzureStorage.class.getClassLoader().getResourceAsStream("application.properties");
+            InputStream propertyStream = FilesAzureStorage.class.getClassLoader()
+                    .getResourceAsStream("application.properties");
             if (propertyStream != null) {
                 prop.load(propertyStream);
-            }
-            else {
+            } else {
                 throw new RuntimeException();
             }
-        } catch (RuntimeException|IOException e) {
+        } catch (RuntimeException | IOException e) {
             System.out.println("\nFailed to load application.properties file.");
             throw e;
         }
 
         try {
             _storageAccount = CloudStorageAccount.parse(prop.getProperty("StorageConnectionString"));
-        }
-        catch (IllegalArgumentException|URISyntaxException e) {
+        } catch (IllegalArgumentException | URISyntaxException e) {
             System.out.println("\nConnection string specifies an invalid URI.");
             System.out.println("Please confirm the connection string is in the Azure connection string format.");
             throw e;
-        }
-        catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e) {
             System.out.println("\nConnection string specifies an invalid key.");
             System.out.println("Please confirm the AccountName and AccountKey in the connection string are valid.");
             throw e;
@@ -77,37 +76,40 @@ public class FilesAzureStorage implements IFilesAdapter {
     /**
      * Creates and returns a container.
      *
-     * @param blobClient CloudBlobClient object
+     * @param blobClient    CloudBlobClient object
      * @param containerName Name of the container to create
      * @return The newly created CloudBlobContainer object
      *
-     * @throws StorageException "invalid storage"
-     * @throws RuntimeException "runtime failed"
-     * @throws IOException "io failed"
-     * @throws URISyntaxException "uri syntax"
+     * @throws StorageException         "invalid storage"
+     * @throws RuntimeException         "runtime failed"
+     * @throws IOException              "io failed"
+     * @throws URISyntaxException       "uri syntax"
      * @throws IllegalArgumentException "illegal argument"
-     * @throws InvalidKeyException "invalid key"
-     * @throws IllegalStateException "illegal state"
+     * @throws InvalidKeyException      "invalid key"
+     * @throws IllegalStateException    "illegal state"
      */
-    private CloudBlobContainer createContainer(CloudBlobClient blobClient, String containerName) throws StorageException, RuntimeException, IOException, InvalidKeyException, IllegalArgumentException, URISyntaxException, IllegalStateException {
+    private CloudBlobContainer createContainer(CloudBlobClient blobClient, String containerName)
+            throws StorageException, RuntimeException, IOException, InvalidKeyException, IllegalArgumentException,
+            URISyntaxException, IllegalStateException {
 
         // Create a new container
         CloudBlobContainer container = blobClient.getContainerReference(containerName);
         try {
             if (!container.createIfNotExists()) {
-                //throw new IllegalStateException(String.format("Container with name \"%s\" already exists.", containerName));
+                // throw new IllegalStateException(String.format("Container with name \"%s\"
+                // already exists.", containerName));
             }
-        }
-        catch (StorageException s) {
+        } catch (StorageException s) {
             if (s.getCause() instanceof java.net.ConnectException) {
-                System.out.println("Caught connection exception from the client. If running with the default configuration please make sure you have started the storage emulator.");
+                System.out.println(
+                        "Caught connection exception from the client. If running with the default configuration please make sure you have started the storage emulator.");
             }
             throw s;
         }
         return container;
     }
 
-    public void connect(){
+    public void connect() {
         try {
             _blobClient = getBlobClientReference();
             _blobContainer = createContainer(_blobClient, _containerName);
@@ -126,7 +128,8 @@ public class FilesAzureStorage implements IFilesAdapter {
     @Override
     public void uploadMetadata(HashMap<String, String> metadata) {
         try {
-            CloudBlockBlob blob = _blobContainer.getBlockBlobReference(metadata.get("owner") + "-" + metadata.get("filename"));
+            CloudBlockBlob blob = _blobContainer
+                    .getBlockBlobReference(metadata.get("owner") + "-" + metadata.get("filename"));
             uploadEmptyBlob(blob);
 
             blob.setMetadata(metadata);
