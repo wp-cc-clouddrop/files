@@ -12,17 +12,17 @@ public class Metadata {
     private String type;
     private String lastModified;
     private String contentLocation;
-    private String owner;
+    private String username;
 
     public Metadata() {
     }
 
-    public String getOwner() {
-        return owner;
+    public String getUsername() {
+        return username;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public Metadata(Metadata resource, String location) {

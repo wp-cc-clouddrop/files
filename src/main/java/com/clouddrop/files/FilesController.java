@@ -50,10 +50,10 @@ public class FilesController {
         Preconditions.checkNotNull(resource);
 
         // TODO: get this from auth header?
-        String owner = "testOwner";
-        resource.setOwner(owner);
+        String username = "testUsername";
+        resource.setUsername(username);
 
-        String location = "/files/" + owner + "/" + resource.getFilename();
+        String location = "/files/" + username + "/" + resource.getFilename();
         resource.updateLastModified();
         resource.setContentLocation(location);
         fas.uploadMetadata(service.toMap(resource));
@@ -62,12 +62,12 @@ public class FilesController {
         return resource;
     }
 
-    @RequestMapping(path = "/files/{owner}/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
+    @RequestMapping(path = "/files/{username}/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
-    public void updateFile(@PathVariable("owner") String owner, @PathVariable("filename") String filename,
+    public void updateFile(@PathVariable("username") String username, @PathVariable("filename") String filename,
             @RequestParam("file") MultipartFile file, HttpServletResponse response) {
         try {
-            if (!fas.updateFile(owner, filename, file.getBytes())) {
+            if (!fas.updateFile(username, filename, file.getBytes())) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
             }
         } catch (IOException e) {
@@ -115,7 +115,7 @@ public class FilesController {
         mapParam.put("filename",filename);
         mapParam.put("type",type);
         mapParam.put("lastModified",dateModified);
-        map.put("owner",userName);
+        map.put("username",userName);
         map.put("searchedParam",mapParam);
         map.put("result",liste);
         return map;

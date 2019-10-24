@@ -59,7 +59,7 @@ public class MetadataService {
         map.put("type", m.getType());
         map.put("lastModified", m.getLastModified());
         map.put("contentLocation", m.getContentLocation());
-        map.put("owner", m.getOwner());
+        map.put("username", m.getUsername());
         return map;
     }
 
