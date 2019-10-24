@@ -4,6 +4,7 @@ import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
 import com.google.common.base.Preconditions;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +41,49 @@ public class FilesController {
         service = new MetadataService();
     }
 
+    private String call_me(String token) throws Exception {
+        String url = "http://clouddrop.xyz/user/auth";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        // optional default is GET
+        con.setRequestMethod("GET");
+        //add request header
+        con.setRequestProperty("Authorization", token);
+        int responseCode = con.getResponseCode();
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        //Read JSON response and print
+        JSONObject myResponse = new JSONObject(response.toString());
+        String email = null;
+        if(responseCode == 200 ){
+            email = myResponse.getString("email");
+            log.debug(email);
+        }
+        return email;
+    }
+
     @RequestMapping(path = "/files/metadata", method = RequestMethod.POST, consumes = "application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public Metadata uploadMetadata(@RequestBody Metadata resource, HttpServletResponse response) {
+    public Metadata uploadMetadata(@RequestBody Metadata resource, HttpServletResponse response, @RequestHeader("Authorization") String auth ) {
         Preconditions.checkNotNull(resource);
 
-        // TODO: get this from auth header?
-        String username = TEST_USERNAME;
+        String username = null;
+        try {
+            log.debug("Hallo "+auth);
+            username = call_me(auth);
+            if(username == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not allowed");
+        }
         resource.setUsername(username);
 
         String location = "/files/" + username + "/" + resource.getFilename();
@@ -54,25 +95,39 @@ public class FilesController {
         return resource;
     }
 
-    @RequestMapping(path = "/files/{username}/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
+    @RequestMapping(path = "/files/{filename}", method = RequestMethod.PUT, consumes = "multipart/form-data")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateFile(@PathVariable("username") String username, @PathVariable("filename") String filename,
-            @RequestParam("file") MultipartFile file, HttpServletResponse response) {
-        try {
-            if (!fas.updateFile(username, filename, file.getBytes())) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
+    public void updateFile(@PathVariable("filename") String filename,
+            @RequestParam("file") MultipartFile file, HttpServletResponse response,@RequestHeader("Authorization") String auth) {
+        String username = null;
+            try {
+                username = call_me(auth);
+                if(username == null){
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                }
+                if (!fas.updateFile(username, filename, file.getBytes())) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping(path = "/files/{filename}", produces = "multipart/form-data")
     @ResponseStatus(HttpStatus.OK)
-    public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response) {
-        // TODO: get username/username from auth header
-        String username = TEST_USERNAME;
+    public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response,@RequestHeader("Authorization") String auth) {
+        String username = null;
+        try {
+            username = call_me(auth);
+            if(username == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         byte[] data = fas.downloadFile(username, filename);
         if (data == null) {
@@ -84,8 +139,16 @@ public class FilesController {
 
     @DeleteMapping(path = "/files/{filename}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFile(@PathVariable("filename") String filename) {
-        String username = TEST_USERNAME;
+    public void deleteFile(@PathVariable("filename") String filename,@RequestHeader("Authorization") String auth) {
+        String username = null;
+        try {
+            username = call_me(auth);
+            if(username == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             fas.deleteFile(username, filename);
@@ -96,7 +159,18 @@ public class FilesController {
 
     @GetMapping("/files/list/{userName}")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> getListFiles(@PathVariable("userName") String userName) {
+    public Map<String, Object> getListFiles(@PathVariable("userName") String userName,@RequestHeader("Authorization") String auth) {
+
+        String username = null;
+        try {
+            username = call_me(auth);
+            if(username == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         List<String> liste = fas.listFiles(userName);
         Map<String,Object> map = new HashMap<>();
         map.put("list",liste);
@@ -109,8 +183,19 @@ public class FilesController {
     public Map<String, Object> searchFiles(@PathVariable("userName") String userName,
                               @RequestParam(value = "filename", required = false) String filename,
                               @RequestParam(value = "type", required = false) String type,
-                              @RequestParam(value = "dateModified", required = false) String dateModified) {
-        //String answer = "GET to /files/list/search with params";
+                              @RequestParam(value = "dateModified", required = false) String dateModified,
+                                           @RequestHeader("Authorization") String auth) {
+
+        String username = null;
+        try {
+            username = call_me(auth);
+            if(username == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         List<String> liste = fas.searchFile(userName,filename,type,dateModified);
 
         Map<String,Object> map = new HashMap<>();
