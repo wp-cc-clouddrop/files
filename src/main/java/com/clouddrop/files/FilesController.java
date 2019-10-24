@@ -78,7 +78,7 @@ public class FilesController {
             log.debug("Hallo "+auth);
             username = call_me(auth);
             if(username == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,14 +103,14 @@ public class FilesController {
             try {
                 username = call_me(auth);
                 if(username == null){
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                    throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
                 }
                 if (!fas.updateFile(username, filename, file.getBytes())) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -123,7 +123,7 @@ public class FilesController {
         try {
             username = call_me(auth);
             if(username == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -144,7 +144,7 @@ public class FilesController {
         try {
             username = call_me(auth);
             if(username == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
         } catch (Exception e) {
             e.printStackTrace();
