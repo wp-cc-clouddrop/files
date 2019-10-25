@@ -284,7 +284,7 @@ public class FilesAzureStorage implements IFilesAdapter {
                 matches &= metaData.containsValue(date);
             }
             if(matches){
-                results.add(metaData.get("Dateiname"));
+                results.add(metaData.get("filename"));
             }
         }
         for(String s : results){
