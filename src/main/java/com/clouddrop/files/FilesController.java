@@ -177,6 +177,7 @@ public class FilesController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
         }
 
         List<String> liste = fas.listFiles(username);
