@@ -15,6 +15,7 @@ import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
 import com.google.common.base.Preconditions;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class FilesController {
         service = new MetadataService();
     }
 
-    private String call_me(String token) throws Exception {
+    private String call_me(String token) throws IOException, JSONException {
         String url = "http://clouddrop.xyz/user/auth";  // TODO: try change this to https???
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -70,9 +71,13 @@ public class FilesController {
         String email = null;
         if(responseCode == 200 ){
             email = myResponse.getString("email");
-            log.debug(email);
+            log.debug("EMAIL: " + email);
+            return email;
         }
-        return email;
+        else {
+            HttpStatus status =  HttpStatus.valueOf(responseCode);
+            return status.getReasonPhrase();
+        }
     }
 
     @RequestMapping(path = "/files/metadata", method = RequestMethod.POST, consumes = "application/json")
@@ -146,7 +151,7 @@ public class FilesController {
     }
 
     @DeleteMapping(path = "/files/{filename}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.GONE)
     public void deleteFile(@PathVariable("filename") String filename,@RequestHeader("Authorization") String auth) {
         String username = null;
         try {
@@ -198,11 +203,22 @@ public class FilesController {
         try {
             username = call_me(auth);
             if(username == null){
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not authorized");
             }
-        } catch (Exception e) {
+
+            if (!username.contains("@")) {
+                // got a error response code;
+                // username now contains error response code from URLConnection
+                throw new ResponseStatusException(HttpStatus.valueOf(username));
+
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "error sending request to user service");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is invalid");
         }
 
         List<String> liste = fas.searchFile(username,filename,type,dateModified);
