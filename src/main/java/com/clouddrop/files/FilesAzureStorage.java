@@ -285,7 +285,7 @@ public class FilesAzureStorage implements IFilesAdapter {
             }
         }
         for(String s : results){
-            System.out.println(s);
+            log.debug("SEARCH: found matching: " + s);
         }
         return results;
     }
