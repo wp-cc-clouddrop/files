@@ -198,10 +198,11 @@ public class FilesController {
         try {
             username = call_me(auth);
             if(username == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "username is invalid");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED "username is invalid");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
         }
 
         List<String> liste = fas.searchFile(username,filename,type,dateModified);
