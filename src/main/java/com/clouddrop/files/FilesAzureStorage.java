@@ -253,20 +253,23 @@ public class FilesAzureStorage implements IFilesAdapter {
     public List<String> searchFile(final String username,final String name, final String typ, final String date){
         List<String> results = new ArrayList<>();
         if(name == null && typ == null && date == null){
-            return listFiles(username);
+            return null;
         }
         for(ListBlobItem blobItem : _blobContainer.listBlobs(username)){
             HashMap<String,String> metaData;
-            if(blobItem instanceof CloudBlob){
-                try {
-                    ((CloudBlob) blobItem).downloadAttributes();
-                } catch (StorageException e) {
-                    e.printStackTrace();
-                }
-                metaData = ((CloudBlob) blobItem).getMetadata();
-            }else{
+            if(!(blobItem instanceof CloudBlob)){
                 continue;
             }
+
+            try {
+                ((CloudBlob) blobItem).downloadAttributes();
+            } catch (StorageException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            metaData = ((CloudBlob) blobItem).getMetadata();
+
             boolean nameExists = name != null;
             boolean typeExists = typ != null;
             boolean dateExists = date != null;

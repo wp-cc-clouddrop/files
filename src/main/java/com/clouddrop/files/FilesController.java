@@ -206,6 +206,9 @@ public class FilesController {
         }
 
         List<String> liste = fas.searchFile(username,filename,type,dateModified);
+        if (liste == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No search parameter sent");
+        }
 
         Map<String,Object> map = new HashMap<>();
         Map<String,Object> mapParam = new HashMap<>();
