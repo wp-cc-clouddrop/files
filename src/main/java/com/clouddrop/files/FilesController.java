@@ -151,8 +151,8 @@ public class FilesController {
     }
 
     @DeleteMapping(path = "/files/{filename}")
-    @ResponseStatus(HttpStatus.GONE)
     public void deleteFile(@PathVariable("filename") String filename,@RequestHeader("Authorization") String auth) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
         String username = null;
         try {
             username = call_me(auth);
