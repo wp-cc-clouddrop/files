@@ -43,22 +43,11 @@ public class FilesAzureStorage implements IFilesAdapter {
             throws RuntimeException, IOException, IllegalArgumentException, URISyntaxException, InvalidKeyException {
 
         // Retrieve the connection string
-        Properties prop = new Properties();
-        try {
-            InputStream propertyStream = FilesAzureStorage.class.getClassLoader()
-                    .getResourceAsStream("application.properties");
-            if (propertyStream != null) {
-                prop.load(propertyStream);
-            } else {
-                throw new RuntimeException();
-            }
-        } catch (RuntimeException | IOException e) {
-            System.out.println("\nFailed to load application.properties file.");
-            throw e;
-        }
+        String connString = System.getenv("AZURE_BLOB_CONN_STRING");
+        log.debug("Azure Blob connection string: " + connString);
 
         try {
-            _storageAccount = CloudStorageAccount.parse(prop.getProperty("StorageConnectionString"));
+            _storageAccount = CloudStorageAccount.parse(connString);
         } catch (IllegalArgumentException | URISyntaxException e) {
             System.out.println("\nConnection string specifies an invalid URI.");
             System.out.println("Please confirm the connection string is in the Azure connection string format.");
