@@ -24,6 +24,7 @@ public class TextMetadataExtractor {
     private String _apiEndpoint;
     private String _subscriptionKey;
     private int _idCounter;
+    private boolean _notAvailable;
 
     private static Logger log = LoggerFactory.getLogger(TextMetadataExtractor.class);
 
@@ -55,26 +56,38 @@ public class TextMetadataExtractor {
                                 });
                     }
                 });
-        _apiClient.withAzureRegion(AzureRegions.NORTHEUROPE);
+        if (_apiClient == null) {
+            _notAvailable = true;
+        } else {
+            _apiClient.withAzureRegion(AzureRegions.NORTHEUROPE);
+            _notAvailable = false;
+        }
+
     }
 
     public String getMetadata(String text) {
-        List<MultiLanguageInput> inputList = new ArrayList<MultiLanguageInput>();
-        inputList.add(makeInput(String.valueOf(_idCounter), text));
-        MultiLanguageBatchInputInner batch = new MultiLanguageBatchInputInner();
-        batch.withDocuments(inputList);
-        KeyPhraseBatchResultInner result = _apiClient.keyPhrases(batch);
-
         String resultString = "";
-        for(KeyPhraseBatchResultItem document : result.documents())
-        {
-            for(String keyphrase : document.keyPhrases())
+        if (!_notAvailable) {
+            List<MultiLanguageInput> inputList = new ArrayList<MultiLanguageInput>();
+            inputList.add(makeInput(String.valueOf(_idCounter), text));
+            MultiLanguageBatchInputInner batch = new MultiLanguageBatchInputInner();
+            batch.withDocuments(inputList);
+            KeyPhraseBatchResultInner result = _apiClient.keyPhrases(batch);
+
+
+            for(KeyPhraseBatchResultItem document : result.documents())
             {
-                resultString += keyphrase + ",";
+                for(String keyphrase : document.keyPhrases())
+                {
+                    resultString += keyphrase + ",";
+                }
             }
+            resultString = resultString.substring(0,resultString.length()-1);
+            _idCounter ++;
+        } else {
+            resultString = "not-available,";
         }
-        resultString = resultString.substring(0,resultString.length()-1);
-        _idCounter ++;
+
         return resultString;
     }
 
