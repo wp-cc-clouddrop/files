@@ -56,7 +56,7 @@ public class PicMetadataExtractor {
                 } else {
 
                     for (ImageTag tag : analysis.tags()) {
-                        System.out.printf("\'%s\' with confidence %2.2f%%\n", tag.name(), tag.confidence() * 100);
+                        //System.out.printf("\'%s\' with confidence %2.2f%%\n", tag.name(), tag.confidence() * 100);
                         resultString+=tag.name() + ",";
                     }
                 }
