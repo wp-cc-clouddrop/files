@@ -158,7 +158,7 @@ public class FilesAzureStorage implements IFilesAdapter {
 
             // extract and set metadata
             String type = metadata.get("type");
-            String tags = "";
+            String tags = "testtag,";
             switch (type){
                 case ".png":
                 case ".jpg":
