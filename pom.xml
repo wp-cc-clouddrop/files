@@ -66,6 +66,17 @@
 			<version>0.0.20131108.vaadin1</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure.cognitiveservices</groupId>
+			<artifactId>azure-cognitiveservices-computervision</artifactId>
+			<version>1.0.2-beta</version>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.azure.cognitiveservices</groupId>
+			<artifactId>azure-cognitiveservices-language</artifactId>
+			<version>0.0.1-beta</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

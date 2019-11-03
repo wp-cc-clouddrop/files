@@ -49,8 +49,8 @@ public class FilesController {
         service = new MetadataService();
     }
 
-    private String call_me(String token) throws IOException, JSONException {
-        String url = "http://clouddrop.xyz/user/auth";  // TODO: try change this to https???
+    private String verifyJWT(String token) throws IOException, JSONException {
+        String url = "http://clouddrop.xyz/user/auth";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         // optional default is GET
@@ -88,7 +88,7 @@ public class FilesController {
         String username = null;
         try {
             log.debug("Hallo "+auth);
-            username = call_me(auth);
+            username = verifyJWT(auth);
             if(username == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
@@ -101,7 +101,8 @@ public class FilesController {
         String location = "/files/" + resource.getFilename();
         resource.updateLastModified();
         resource.setContentLocation(location);
-        fas.uploadMetadata(service.toMap(resource));
+        HashMap<String,String> map = service.toMap(resource);
+        fas.uploadMetadata(map);
 
         response.addHeader("Location", location);
         return resource;
@@ -113,13 +114,14 @@ public class FilesController {
             @RequestParam("file") MultipartFile file, HttpServletResponse response,@RequestHeader("Authorization") String auth) {
         String username = null;
             try {
-                username = call_me(auth);
+                username = verifyJWT(auth);
                 if(username == null){
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
                 }
                 if (!fas.updateFile(username, filename, file.getBytes())) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
                 }
+                //TODO: hier metadaten holen
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -134,7 +136,7 @@ public class FilesController {
     public byte[] getFile(@PathVariable("filename") String filename, HttpServletResponse response,@RequestHeader("Authorization") String auth) {
         String username = null;
         try {
-            username = call_me(auth);
+            username = verifyJWT(auth);
             if(username == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
@@ -155,7 +157,7 @@ public class FilesController {
     public void deleteFile(@PathVariable("filename") String filename,@RequestHeader("Authorization") String auth) {
         String username = null;
         try {
-            username = call_me(auth);
+            username = verifyJWT(auth);
             if(username == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
@@ -176,7 +178,7 @@ public class FilesController {
 
         String username = null;
         try {
-            username = call_me(auth);
+            username = verifyJWT(auth);
             if(username == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
             }
@@ -192,16 +194,18 @@ public class FilesController {
         return map;
     }
 
+    //TODO: tag search
     @GetMapping("/files/list/search")
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> searchFiles(@RequestHeader("Authorization") String auth,
                             @RequestParam(value = "filename", required = false) String filename,
                             @RequestParam(value = "type", required = false) String type,
-                            @RequestParam(value = "dateModified", required = false) String dateModified) {
+                            @RequestParam(value = "dateModified", required = false) String dateModified)
+                            {
 
         String username = null;
         try {
-            username = call_me(auth);
+            username = verifyJWT(auth);
             if(username == null){
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token not authorized");
             }
