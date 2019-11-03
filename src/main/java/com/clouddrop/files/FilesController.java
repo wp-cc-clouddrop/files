@@ -101,6 +101,7 @@ public class FilesController {
         String location = "/files/" + resource.getFilename();
         resource.updateLastModified();
         resource.setContentLocation(location);
+        resource.setTags("");
         HashMap<String,String> map = service.toMap(resource);
         fas.uploadMetadata(map);
 
