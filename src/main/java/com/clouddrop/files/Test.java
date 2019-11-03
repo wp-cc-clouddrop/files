@@ -2,7 +2,12 @@ package com.clouddrop.files;
 
 import com.clouddrop.files.model.Metadata;
 import com.clouddrop.files.services.MetadataService;
+import com.clouddrop.files.services.PicMetadataExtractor;
 import com.clouddrop.files.services.TextMetadataExtractor;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class Test {
     public static void main(String ... unused){
@@ -29,8 +34,16 @@ public class Test {
         Metadata mnew = new Metadata(m, "heri");
         System.out.println(mnew.getLastModified());
          */
-        TextMetadataExtractor extr = new TextMetadataExtractor();
-        System.out.println(extr.getMetadata("Unfortunately, it rained during my entire trip to Seattle. I didn't even get to visit the Space Needle"));
+        //TextMetadataExtractor extr = new TextMetadataExtractor();
+        //System.out.println(extr.getMetadata("Unfortunately, it rained during my entire trip to Seattle. I didn't even get to visit the Space Needle"));
+        PicMetadataExtractor extr = new PicMetadataExtractor();
+        String localImagePath = "C:\\Users\\fazel\\Desktop\\CloudComputing\\files-service\\src\\main\\java\\com\\clouddrop\\files\\Fisch.jpg";
+        File localImage = new File(localImagePath);
+        try {
+            System.out.println(extr.getMetadata(Files.readAllBytes(localImage.toPath())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }
