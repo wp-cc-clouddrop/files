@@ -53,8 +53,9 @@ public interface IFilesAdapter {
      * @param name
      * @param type
      * @param date
+     * @param tag
      * @return List of files
      */
-    public List<String> searchFile(final String username, final String name, final String type, final String date);
+    public List<String> searchFile(final String username, final String name, final String type, final String date, final String tag);
 
 }

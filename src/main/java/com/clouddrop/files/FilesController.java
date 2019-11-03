@@ -121,7 +121,7 @@ public class FilesController {
                 if (!fas.updateFile(username, filename, file.getBytes())) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
                 }
-                //TODO: hier metadaten holen
+
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -225,7 +225,7 @@ public class FilesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is invalid");
         }
 
-        List<String> liste = fas.searchFile(username,filename,type,dateModified);
+        List<String> liste = fas.searchFile(username,filename,type,dateModified, "tags");
         if (liste == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No search parameter sent");
         }

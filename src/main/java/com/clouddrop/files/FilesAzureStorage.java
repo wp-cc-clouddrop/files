@@ -1,5 +1,8 @@
 package com.clouddrop.files;
 
+import com.clouddrop.files.services.MetadataService;
+import com.clouddrop.files.services.PicMetadataExtractor;
+import com.clouddrop.files.services.TextMetadataExtractor;
 import com.microsoft.azure.storage.*;
 import com.microsoft.azure.storage.blob.*;
 
@@ -20,11 +23,14 @@ public class FilesAzureStorage implements IFilesAdapter {
     private CloudStorageAccount _storageAccount;
     private CloudBlobClient _blobClient;
     private CloudBlobContainer _blobContainer;
+    private TextMetadataExtractor _txtMetadataExtractor;
+    private PicMetadataExtractor _picMetadataExtractor;
 
     private String _containerName;
 
     public FilesAzureStorage() {
-        // buffer = new byte[0];
+        _txtMetadataExtractor = new TextMetadataExtractor();
+        //_picMetadataExtractor = new PicMetadataExtractor();
     }
 
     /**
@@ -150,6 +156,21 @@ public class FilesAzureStorage implements IFilesAdapter {
             HashMap<String, String> metadata = blob.getMetadata();
             blob.uploadFromByteArray(buffer, 0, buffer.length);
 
+            // extract and set metadata
+            String type = metadata.get("type");
+            String tags = "";
+            switch (type){
+                case ".png":
+                case ".jpg":
+                    //tags += _picMetadataExtractor.getMetadata(buffer);
+                    break;
+                case  ".txt":
+                    tags += _txtMetadataExtractor.getMetadata(new String(buffer));
+                    break;
+                default: log.debug("Type: "+type+" is not supported for AI metadata extraction");
+            }
+            metadata.put("tags",tags);
+
             // Update lastModified
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
@@ -239,9 +260,9 @@ public class FilesAzureStorage implements IFilesAdapter {
     }
 
     @Override
-    public List<String> searchFile(final String username,final String name, final String typ, final String date){
+    public List<String> searchFile(final String username,final String name, final String typ, final String date, final String tag){
         List<String> results = new ArrayList<>();
-        if(name == null && typ == null && date == null){
+        if(name == null && typ == null && date == null && tag == null){
             return null;
         }
         for(ListBlobItem blobItem : _blobContainer.listBlobs(username)){
@@ -262,6 +283,7 @@ public class FilesAzureStorage implements IFilesAdapter {
             boolean nameExists = name != null;
             boolean typeExists = typ != null;
             boolean dateExists = date != null;
+            boolean tagExists = tag != null;
             boolean matches = true;
             if(nameExists){
                 matches &= metaData.containsValue(name);
@@ -271,6 +293,11 @@ public class FilesAzureStorage implements IFilesAdapter {
             }
             if(dateExists){
                 matches &= metaData.containsValue(date);
+            }
+            if(tagExists){
+                String[] tagsArray = metaData.get("tags").split(",");
+                HashSet<String> tagsSet = new HashSet<String>(Arrays.asList(tagsArray));
+                matches &= tagsSet.contains(tag);
             }
             if(matches){
                 results.add(metaData.get("filename"));
