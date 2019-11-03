@@ -14,6 +14,16 @@ public class Metadata {
     private String contentLocation;
     private String username;
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    private String tags;
+
     public Metadata() {
     }
 

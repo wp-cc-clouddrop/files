@@ -200,7 +200,8 @@ public class FilesController {
     public Map<String, Object> searchFiles(@RequestHeader("Authorization") String auth,
                             @RequestParam(value = "filename", required = false) String filename,
                             @RequestParam(value = "type", required = false) String type,
-                            @RequestParam(value = "dateModified", required = false) String dateModified)
+                            @RequestParam(value = "dateModified", required = false) String dateModified,
+                            @RequestParam(value = "tag", required = false) String tag)
                             {
 
         String username = null;
@@ -225,7 +226,7 @@ public class FilesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is invalid");
         }
 
-        List<String> liste = fas.searchFile(username,filename,type,dateModified, "tags");
+        List<String> liste = fas.searchFile(username,filename,type,dateModified, tag);
         if (liste == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No search parameter sent");
         }

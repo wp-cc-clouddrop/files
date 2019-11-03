@@ -28,7 +28,7 @@ public class MetadataService {
     /**
      * Create new file metadata for the user from given metadata.
      *
-     * @param user User
+     * @param resource User
      */
     public Metadata create(Metadata resource) {
         return null;
@@ -60,6 +60,7 @@ public class MetadataService {
         map.put("lastModified", m.getLastModified());
         map.put("contentLocation", m.getContentLocation());
         map.put("username", m.getUsername());
+        map.put("tags", m.getTags());
         return map;
     }
 
