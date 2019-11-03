@@ -12,17 +12,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * only works with english
  */
 public class TextMetadataExtractor {
 
     private TextAnalyticsAPIImpl _apiClient;
-    private String _apiEndpoint = System.getenv("AZURE_CS_TEXT_ANALYSIS_ENDPOINT");
-    private String _subscriptionKey = System.getenv("AZURE_CS_TEXT_ANALYSIS_KEY");
+    private String _apiEndpoint;
+    private String _subscriptionKey;
     private int _idCounter;
 
+    private static Logger log = LoggerFactory.getLogger(TextMetadataExtractor.class);
+
     public TextMetadataExtractor() {
+        _apiEndpoint = System.getenv("AZURE_CS_TEXT_ANALYSIS_ENDPOINT");
+        _subscriptionKey = System.getenv("AZURE_CS_TEXT_ANALYSIS_KEY");
+
+        if (_apiClient == null || _subscriptionKey == null) {
+            log.error("Env. Variables for credentials are not available for AI Service Text Analysis");
+        }
         _idCounter = 0;
         _apiClient = new TextAnalyticsAPIImpl(
                 _apiEndpoint,
