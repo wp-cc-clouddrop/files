@@ -172,14 +172,17 @@ public class FilesAzureStorage implements IFilesAdapter {
                     break;
                 default: log.debug("Type: "+type+" is not supported for AI metadata extraction");
             }
+
+            //TODO: log this
             metadata.put("tags",tags);
 
             // Update lastModified
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             metadata.put("lastModified", dtf.format(now));
-            blob.setMetadata(metadata);
-            blob.uploadMetadata();
+            /*blob.setMetadata(metadata);
+            blob.uploadMetadata();*/
+            uploadMetadata(metadata);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (StorageException e) {
