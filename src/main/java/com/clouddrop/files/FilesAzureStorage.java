@@ -165,7 +165,10 @@ public class FilesAzureStorage implements IFilesAdapter {
                     //tags += _picMetadataExtractor.getMetadata(buffer);
                     break;
                 case  ".txt":
-                    tags += _txtMetadataExtractor.getMetadata(new String(buffer));
+                    String textfileAsString = new String(buffer);
+                    log.debug("pre metadataextr with: "+textfileAsString);
+                    tags += _txtMetadataExtractor.getMetadata(textfileAsString);
+                    log.debug("post metadataextr result: "+tags);
                     break;
                 default: log.debug("Type: "+type+" is not supported for AI metadata extraction");
             }

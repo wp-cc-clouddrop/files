@@ -237,6 +237,7 @@ public class FilesController {
         mapParam.put("filename",filename);
         mapParam.put("type",type);
         mapParam.put("lastModified",dateModified);
+        mapParam.put("tag", tag);
         map.put("username",username);
         map.put("searchedParam",mapParam);
         map.put("result",liste);
