@@ -158,31 +158,32 @@ public class FilesAzureStorage implements IFilesAdapter {
 
             // extract and set metadata
             String type = metadata.get("type");
-            String tags = "testtag,";
+            String tags = metadata.get("tags");
             switch (type){
                 case ".png":
                 case ".jpg":
-                    //tags += _picMetadataExtractor.getMetadata(buffer);
+                    tags += _picMetadataExtractor.getMetadata(buffer);
                     break;
                 case  ".txt":
                     String textfileAsString = new String(buffer);
-                    log.debug("pre metadataextr with: "+textfileAsString);
+                    log.debug("pre metadataextr with: " + textfileAsString);
                     tags += _txtMetadataExtractor.getMetadata(textfileAsString);
-                    log.debug("post metadataextr result: "+tags);
+                    log.debug("post metadataextr result: " + tags);
                     break;
-                default: log.debug("Type: "+type+" is not supported for AI metadata extraction");
+                default: log.debug("Type: " + type + " is not supported for AI metadata extraction");
             }
-
-            //TODO: log this
             metadata.put("tags",tags);
 
             // Update lastModified
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
             LocalDateTime now = LocalDateTime.now();
             metadata.put("lastModified", dtf.format(now));
-            /*blob.setMetadata(metadata);
-            blob.uploadMetadata();*/
-            uploadMetadata(metadata);
+
+            // log metadata content
+            log.debug("metadata content: " + metadata.toString());
+
+            blob.setMetadata(metadata);
+            blob.uploadMetadata();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (StorageException e) {

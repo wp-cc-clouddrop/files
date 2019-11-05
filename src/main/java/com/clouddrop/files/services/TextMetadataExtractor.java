@@ -75,6 +75,7 @@ public class TextMetadataExtractor {
                 resultString += keyphrase + ",";
             }
         }
+        // remove last comma
         resultString = resultString.substring(0,resultString.length());
         _idCounter ++;
 
