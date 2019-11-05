@@ -9,7 +9,7 @@ public class PicMetadataExtractor {
 
     private ComputerVisionClient _cvc;
     private String _subscriptionKey = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
-    private String _endpoint = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
+    private String _endpoint = System.getenv("AZURE_CS_PICTURE_ANALYSIS_ENDPOINT");
 
     public PicMetadataExtractor(){
         authenticate(_subscriptionKey, _endpoint);
