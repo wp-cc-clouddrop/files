@@ -72,7 +72,7 @@ public class TextMetadataExtractor {
         {
             for(String keyphrase : document.keyPhrases())
             {
-                resultString += keyphrase + ",";
+                resultString += keyphrase.toLowerCase() + ",";
             }
         }
         // remove last comma

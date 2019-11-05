@@ -304,7 +304,7 @@ public class FilesAzureStorage implements IFilesAdapter {
             if(tagExists){
                 String[] tagsArray = metaData.get("tags").split(",");
                 HashSet<String> tagsSet = new HashSet<String>(Arrays.asList(tagsArray));
-                matches &= tagsSet.contains(tag);
+                matches &= tagsSet.contains(tag.toLowerCase());
             }
             if(matches){
                 results.add(metaData.get("filename"));
