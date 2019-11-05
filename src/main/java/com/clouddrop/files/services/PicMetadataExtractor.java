@@ -8,12 +8,8 @@ import com.microsoft.azure.cognitiveservices.vision.computervision.models.TagRes
 public class PicMetadataExtractor {
 
     private ComputerVisionClient _cvc;
-    //private String _subscriptionKey = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
-    //private String _endpoint = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
-
-    private String _subscriptionKey = "99498f345efd4d878bad0e9385697d53";
-    private String _endpoint = "https://datamining.cognitiveservices.azure.com/";
-
+    private String _subscriptionKey = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
+    private String _endpoint = System.getenv("AZURE_CS_PICTURE_ANALYSIS_KEY");
 
     public PicMetadataExtractor(){
         authenticate(_subscriptionKey, _endpoint);

@@ -30,7 +30,7 @@ public class FilesAzureStorage implements IFilesAdapter {
 
     public FilesAzureStorage() {
         _txtMetadataExtractor = new TextMetadataExtractor();
-        //_picMetadataExtractor = new PicMetadataExtractor();
+        _picMetadataExtractor = new PicMetadataExtractor();
     }
 
     /**
