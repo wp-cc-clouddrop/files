@@ -75,7 +75,7 @@ public class TextMetadataExtractor {
                 resultString += keyphrase + ",";
             }
         }
-        resultString = resultString.substring(0,resultString.length()-1);
+        resultString = resultString.substring(0,resultString.length());
         _idCounter ++;
 
         return resultString;
