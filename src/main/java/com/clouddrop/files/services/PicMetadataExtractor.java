@@ -62,7 +62,7 @@ public class PicMetadataExtractor {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-        resultString = resultString.substring(0,resultString.length()-1);
+        resultString = resultString.substring(0,resultString.length());
         return resultString;
     }
     //  END - Tag Image
