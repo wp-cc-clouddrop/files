@@ -55,12 +55,12 @@ public class FilesAzureStorage implements IFilesAdapter {
         try {
             _storageAccount = CloudStorageAccount.parse(connString);
         } catch (IllegalArgumentException | URISyntaxException e) {
-            System.out.println("\nConnection string specifies an invalid URI.");
-            System.out.println("Please confirm the connection string is in the Azure connection string format.");
+            log.debug("\nConnection string specifies an invalid URI.");
+            log.debug("Please confirm the connection string is in the Azure connection string format.");
             throw e;
         } catch (InvalidKeyException e) {
-            System.out.println("\nConnection string specifies an invalid key.");
-            System.out.println("Please confirm the AccountName and AccountKey in the connection string are valid.");
+            log.debug("\nConnection string specifies an invalid key.");
+            log.debug("Please confirm the AccountName and AccountKey in the connection string are valid.");
             throw e;
         }
 
