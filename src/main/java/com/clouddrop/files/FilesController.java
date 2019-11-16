@@ -33,10 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.micrometer.core.annotation.Timed;
-
 @RestController
-@Timed
 public class FilesController {
 
     private static Logger log = LoggerFactory.getLogger(FilesController.class);
