@@ -61,5 +61,4 @@ cloud-deploy:
     - az aks get-credentials --resource-group $AZ_RESOURCE_GROUP --name $AZ_CLUSTER_NAME
     - kubectl config use-context $AZ_CLUSTER_NAME
     # deploy new image!
-    - kubectl -n default rollout restart deployment/users-svc
     - kubectl -n default rollout restart deployment/files-svc
