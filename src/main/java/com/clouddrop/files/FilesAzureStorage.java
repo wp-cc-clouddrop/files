@@ -121,6 +121,7 @@ public class FilesAzureStorage implements IFilesAdapter {
 
     @Override
     public void uploadMetadata(HashMap<String, String> metadata) {
+        log.debug(metadata.toString());
         try {
             CloudBlockBlob blob = _blobContainer
                     .getBlockBlobReference(metadata.get("username") + "-" + metadata.get("filename"));
