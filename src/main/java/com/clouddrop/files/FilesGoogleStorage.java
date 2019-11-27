@@ -27,7 +27,7 @@ public class FilesGoogleStorage implements IFilesAdapter {
         setBucketName("guestbucket");
 
         // Creates the new bucket
-        setBucket(_storage.create(BucketInfo.of(_bucketName)));
+        setBucket(getStorage().create(BucketInfo.of(getBucketName())));
     }
 
     public Storage getStorage() {
