@@ -1,6 +1,8 @@
 package com.clouddrop.files;
 
 import com.google.api.gax.paging.Page;
+import com.google.auth.oauth2.ComputeEngineCredentials;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
 
@@ -17,11 +19,12 @@ public class FilesGoogleStorage implements IFilesAdapter {
     private Storage _storage;
     private Bucket _bucket;
     private String _bucketName;
-    //private Blob _blob;
 
     public FilesGoogleStorage(){
+        // Explicitly request service account credentials from the compute engine instance.
+        GoogleCredentials credentials = ComputeEngineCredentials.create();
         // Instantiates a client
-        setStorage(StorageOptions.getDefaultInstance().getService());//ToDo we have to find a way to set here the credentials for gcp
+        setStorage(StorageOptions.newBuilder().setCredentials(credentials).build().getService());//ToDo maybe this could be a solution
 
         //The name of the bucket to access
         setBucketName("guestbucket");
