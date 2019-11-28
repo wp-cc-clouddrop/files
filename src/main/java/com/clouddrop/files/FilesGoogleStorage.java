@@ -1,5 +1,7 @@
 package com.clouddrop.files;
 
+import com.google.common.collect.Lists;
+import java.util.List.*;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ComputeEngineCredentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -8,6 +10,7 @@ import com.google.cloud.storage.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -20,9 +23,16 @@ public class FilesGoogleStorage implements IFilesAdapter {
     private Bucket _bucket;
     private String _bucketName;
 
-    public FilesGoogleStorage(){
+    public FilesGoogleStorage(String jsonPath){
         // Explicitly request service account credentials from the compute engine instance.
-        GoogleCredentials credentials = ComputeEngineCredentials.create();
+        //GoogleCredentials credentials = ComputeEngineCredentials.create();
+        GoogleCredentials credentials = null;
+        try {
+            credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
+                    .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         // Instantiates a client
         setStorage(StorageOptions.newBuilder().setCredentials(credentials).build().getService());//ToDo maybe this could be a solution
 
@@ -30,7 +40,10 @@ public class FilesGoogleStorage implements IFilesAdapter {
         setBucketName("guestbucket");
 
         // Creates the new bucket
-        setBucket(getStorage().create(BucketInfo.of(getBucketName())));
+        _bucket = getStorage().get(getBucketName());
+        if(getBucket() == null){
+            setBucket(getStorage().create(BucketInfo.of(getBucketName())));
+        }
     }
 
     public Storage getStorage() {
@@ -61,7 +74,7 @@ public class FilesGoogleStorage implements IFilesAdapter {
     public void uploadMetadata(HashMap<String, String> metadata) {
         //https://cloud.google.com/storage/docs/uploading-objects
         BlobId blobId = BlobId.of(getBucketName(), metadata.get("username")+"-"+metadata.get("filename"));
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").setMetadata(metadata).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)/*.setContentType("text/plain")*/.setMetadata(metadata).build();
         Blob blob = getStorage().create(blobInfo, new byte[0]);
     }
 
@@ -130,9 +143,8 @@ public class FilesGoogleStorage implements IFilesAdapter {
             if(value == -1){
                 continue;
             }
-            //String s = String.format("\t\t%s\t: %s", ((CloudBlob) blobItem).getProperties().getBlobType(), path.substring(pathIndex+prefix.length()));
-            String s = String.format("%s", (name.substring(value+username.length())));
-            results.add(s);
+            Map<String,String> metaData = blob.getMetadata();
+            results.add(metaData.get("filename"));
         }
         return results;
     }
