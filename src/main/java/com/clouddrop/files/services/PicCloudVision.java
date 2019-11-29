@@ -1,5 +1,7 @@
 package com.clouddrop.files.services;
 
+import com.google.api.gax.core.FixedCredentialsProvider;
+import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
 import com.google.common.collect.Lists;
@@ -24,21 +26,20 @@ public class PicCloudVision {
         }
     }
 
-    public PicCloudVision(String jsonPath){
+    /*public PicCloudVision(String jsonPath){
 
         try {
-            // You can specify a credential file by providing a path to GoogleCredentials.
-            // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
-                    .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
-
+            ImageAnnotatorSettings imageAnnotatorSettings =
+                    ImageAnnotatorSettings.newBuilder()
+                            .setCredentialsProvider(FixedCredentialsProvider.create())
+                            .build();
             // Instantiates a client
-            _vision = ImageAnnotatorClient.create(ImageAnnotatorSettings.newBuilder().setCredentialsProvider());//ToDo hier muss noch was gemacht werden!!!
+            _vision = ImageAnnotatorClient.create(imageAnnotatorSettings);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
+*/
 
     public String getMetadata(byte[] picture){
         String metaData = TagImage(_vision,picture);

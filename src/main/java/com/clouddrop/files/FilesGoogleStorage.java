@@ -47,8 +47,6 @@ public class FilesGoogleStorage implements IFilesAdapter {
     }
 
     public FilesGoogleStorage(){
-        // Explicitly request service account credentials from the compute engine instance.
-        GoogleCredentials credentials = ComputeEngineCredentials.create();
         // Instantiates a client
         setStorage(StorageOptions.getDefaultInstance().getService());
 
