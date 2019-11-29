@@ -36,14 +36,16 @@ public class Test {
          */
         //TextMetadataExtractor extr = new TextMetadataExtractor();
         //System.out.println(extr.getMetadata("Unfortunately, it rained during my entire trip to Seattle. I didn't even get to visit the Space Needle"));
-        PicMetadataExtractor extr = new PicMetadataExtractor();
+        /*PicMetadataExtractor extr = new PicMetadataExtractor();
         String localImagePath = "C:\\Users\\fazel\\Desktop\\CloudComputing\\files-service\\src\\main\\java\\com\\clouddrop\\files\\Fisch.jpg";
         File localImage = new File(localImagePath);
         try {
             System.out.println(extr.getMetadata(Files.readAllBytes(localImage.toPath())));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+
 
     }
 }

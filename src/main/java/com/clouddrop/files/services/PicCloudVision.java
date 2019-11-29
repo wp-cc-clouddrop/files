@@ -1,9 +1,12 @@
 package com.clouddrop.files.services;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.vision.v1.*;
+import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +19,21 @@ public class PicCloudVision {
         try {
             // Instantiates a client
             _vision = ImageAnnotatorClient.create();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public PicCloudVision(String jsonPath){
+
+        try {
+            // You can specify a credential file by providing a path to GoogleCredentials.
+            // Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
+            GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
+                    .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+
+            // Instantiates a client
+            _vision = ImageAnnotatorClient.create(ImageAnnotatorSettings.newBuilder().setCredentialsProvider());//ToDo hier muss noch was gemacht werden!!!
         } catch (IOException e) {
             e.printStackTrace();
         }
