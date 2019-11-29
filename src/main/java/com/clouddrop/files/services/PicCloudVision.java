@@ -45,18 +45,16 @@ public class PicCloudVision {
         // Performs label detection on the image file
         BatchAnnotateImagesResponse response = vision.batchAnnotateImages(requests);
         List<AnnotateImageResponse> responses = response.getResponsesList();
-        Map<Descriptors.FieldDescriptor,Object> map;
-        for (AnnotateImageResponse res : responses){
+        Map<Descriptors.FieldDescriptor,Object> resultMap = null;
+        for (AnnotateImageResponse res : responses) {
+            // For full list of available annotations, see http://g.co/cloud/vision/docs
             for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
-                annotation.getAllFields().forEach((k, v) ->
-                        resultString+=v.toString());
-                        /*System.out.printf("%s : %s\n", k, v.toString())
-
-                );*/
+                resultMap = annotation.getAllFields();
             }
         }
-
+        for(Object o : resultMap.keySet()){
+            resultString+=o.toString()+",";
+        }
         return resultString;
     }
-
 }
