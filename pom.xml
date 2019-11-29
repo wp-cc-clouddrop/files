@@ -59,6 +59,12 @@
             <version>1.85.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-language</artifactId>
+            <version>1.85.0</version>
+        </dependency>
+
         <!-- Spring Security for JWT token support -->
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -100,11 +106,6 @@
             <version>${micrometer.version}</version>
         </dependency>
 
-		<dependency>
-  			<groupId>com.google.cloud</groupId>
-  			<artifactId>google-cloud-language</artifactId>
-  			<version>1.85.0</version>
-		</dependency>
     </dependencies>
 
     <build>
