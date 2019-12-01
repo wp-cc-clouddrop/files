@@ -29,6 +29,19 @@ public class FilesAzureStorage implements IFilesAdapter {
     private String _containerName;
 
     public FilesAzureStorage() {
+        try {
+            _blobClient = getBlobClientReference();
+            _blobContainer = createContainer(_blobClient, _containerName);
+            _containerName = "guestcontainer";
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (StorageException e) {
+            e.printStackTrace();
+        }
         _txtMetadataExtractor = new TextMetadataExtractor();
         _picMetadataExtractor = new PicMetadataExtractor();
     }
@@ -101,22 +114,6 @@ public class FilesAzureStorage implements IFilesAdapter {
             throw s;
         }
         return container;
-    }
-
-    public void connect() {
-        try {
-            _blobClient = getBlobClientReference();
-            _blobContainer = createContainer(_blobClient, _containerName);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (StorageException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -319,7 +316,4 @@ public class FilesAzureStorage implements IFilesAdapter {
         return results;
     }
 
-    public void setContainerName(String containerName) {
-        _containerName = containerName;
-    }
 }
