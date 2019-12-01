@@ -38,13 +38,15 @@ public class FilesController {
 
     private static Logger log = LoggerFactory.getLogger(FilesController.class);
 
-    private FilesAzureStorage fas;
+    private IFilesAdapter fs;
     private MetadataService service;
 
-    public FilesController() {
-        fas = new FilesAzureStorage();
-        fas.setContainerName("guestcontainer");
-        fas.connect();
+    public FilesController(IFilesAdapter filesAdapter) {
+        if(filesAdapter instanceof FilesAzureStorage){
+            fs = new FilesAzureStorage();
+        }else{
+            fs = new FilesGoogleStorage();
+        }
 
         service = new MetadataService();
     }
@@ -103,7 +105,7 @@ public class FilesController {
         resource.setContentLocation(location);
         resource.setTags("testtag,");
         HashMap<String,String> map = service.toMap(resource);
-        fas.uploadMetadata(map);
+        fs.uploadMetadata(map);
 
         response.addHeader("Location", location);
         return resource;
@@ -119,7 +121,7 @@ public class FilesController {
                 if(username == null){
                     throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
                 }
-                if (!fas.updateFile(username, filename, file.getBytes())) {
+                if (!fs.updateFile(username, filename, file.getBytes())) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File does not exist");
                 }
 
@@ -145,7 +147,7 @@ public class FilesController {
             e.printStackTrace();
         }
 
-        byte[] data = fas.downloadFile(username, filename);
+        byte[] data = fs.downloadFile(username, filename);
         if (data == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -167,7 +169,7 @@ public class FilesController {
         }
 
         try {
-            fas.deleteFile(username, filename);
+            fs.deleteFile(username, filename);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -188,7 +190,7 @@ public class FilesController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "username is invalid");
         }
 
-        List<String> liste = fas.listFiles(username);
+        List<String> liste = fs.listFiles(username);
         Map<String,Object> map = new HashMap<>();
         map.put("list",liste);
         map.put("username",username);
@@ -227,7 +229,7 @@ public class FilesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username is invalid");
         }
 
-        List<String> liste = fas.searchFile(username,filename,type,dateModified, tag);
+        List<String> liste = fs.searchFile(username,filename,type,dateModified, tag);
         if (liste == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No search parameter sent");
         }
