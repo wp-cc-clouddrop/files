@@ -43,30 +43,14 @@ docker-build:
   - docker push docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service
   tags: [dind, docker]
 
-.azure: &azure
-# connect to azure k8s
-- az login --service-principal --username $AZ_USERNAME --password $AZ_PASSWORD --tenant $AZ_TENANT_ID
-- az aks get-credentials --resource-group $AZ_RESOURCE_GROUP --name $AZ_CLUSTER_NAME
-- kubectl config use-context $AZ_CLUSTER_NAME
-
-.gcp: &gcp
-- gcloud --quiet components update
-- echo ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
-- gcloud --quiet config set project ${GCP_PROJECT_ID}
-
 cloud-deploy:
   stage: deploy
   environment:
     name: Dev
   image: docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/cloudrop/deploy
   script:
-    # check at least one deployment target defined
-    - if [ "$DEPLOY_AZURE" -eq 0 ] && [ "$DEPLOY_GCP" -eq 0 ]; then echo "NO DEPLOY TARGET SPECIFIED"; exit 1; fi
     # get kubectl context from corresponding deployment target
-    # - if [ "$DEPLOY_AZURE" -eq 1 ]; then *azure; fi
-    # - if [ "$DEPLOY_GCP" -eq 1 ]; then *gcp; fi
-    - gcloud --quiet components update
-    - echo ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
-    - gcloud --quiet config set project ${GCP_PROJECT_ID}
+    - ./login-cluster.sh
     # deploy new image!
+    - kubectl version
     - kubectl -n default rollout restart deployment/files-svc
