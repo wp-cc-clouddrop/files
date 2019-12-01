@@ -17,31 +17,31 @@ services:
   - docker:19.03.1-dind
 
 stages:
-  - build
-  - package
+#   - build
+#   - package
   - deploy
 
-# # Cache downloaded dependencies and plugins between builds.
-# # To keep cache across branches add 'key: "$CI_JOB_NAME"'
-cache:
-  paths:
-    - .m2/repository
+# # # Cache downloaded dependencies and plugins between builds.
+# # # To keep cache across branches add 'key: "$CI_JOB_NAME"'
+# cache:
+#   paths:
+#     - .m2/repository
 
-maven-build:
-  image: maven:3-jdk-8
-  stage: build
-  script: "mvn $MAVEN_CLI_OPTS package spring-boot:repackage -B -DskipTests=true"
-  artifacts:
-    paths:
-      - target/*.jar
+# maven-build:
+#   image: maven:3-jdk-8
+#   stage: build
+#   script: "mvn $MAVEN_CLI_OPTS package spring-boot:repackage -B -DskipTests=true"
+#   artifacts:
+#     paths:
+#       - target/*.jar
 
-docker-build:
-  stage: package
-  script:
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker-hub.informatik.haw-hamburg.de
-  - docker build -t docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service .
-  - docker push docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service
-  tags: [dind, docker]
+# docker-build:
+#   stage: package
+#   script:
+#   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker-hub.informatik.haw-hamburg.de
+#   - docker build -t docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service .
+#   - docker push docker-hub.informatik.haw-hamburg.de/wp-cc-clouddrop/files-service
+#   tags: [dind, docker]
 
 .azure: &azure
 # connect to azure k8s
@@ -51,8 +51,9 @@ docker-build:
 
 .gcp: &gcp
 - gcloud --quiet components update
-- echo ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
+- cat ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
 - gcloud --quiet config set project ${GCP_PROJECT_ID}
+- gcloud container clusters get-credentials ${GCP_CLUSTER_NAME} --zone ${GCP_CLUSTER_ZONE}
 
 cloud-deploy:
   stage: deploy
@@ -63,12 +64,8 @@ cloud-deploy:
     # check at least one deployment target defined
     - if [ "$DEPLOY_AZURE" -eq 0 ] && [ "$DEPLOY_GCP" -eq 0 ]; then echo "NO DEPLOY TARGET SPECIFIED"; exit 1; fi
     # get kubectl context from corresponding deployment target
-    # - if [ "$DEPLOY_AZURE" -eq 1 ]; then *azure; fi
-    # - if [ "$DEPLOY_GCP" -eq 1 ]; then *gcp; fi
-    - gcloud --quiet components update
-    - cat ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
-    - gcloud --quiet config set project ${GCP_PROJECT_ID}
-    - gcloud container clusters get-credentials ${GCP_CLUSTER_NAME} --zone ${GCP_CLUSTER_ZONE}
+    - if [ "$DEPLOY_AZURE" -eq 1 ]; then *azure; fi
+    - if [ "$DEPLOY_GCP" -eq 1 ]; then *gcp; fi
     # deploy new image!
     - kubectl version
     - kubectl -n default rollout restart deployment/files-svc
