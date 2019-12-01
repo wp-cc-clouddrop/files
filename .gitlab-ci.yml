@@ -63,7 +63,10 @@ cloud-deploy:
     # check at least one deployment target defined
     - if [ "$DEPLOY_AZURE" -eq 0 ] && [ "$DEPLOY_GCP" -eq 0 ]; then echo "NO DEPLOY TARGET SPECIFIED"; exit 1; fi
     # get kubectl context from corresponding deployment target
-    - if [ "$DEPLOY_AZURE" -eq 1 ]; then *azure; fi
-    - if [ "$DEPLOY_GCP" -eq 1 ]; then *gcp; fi
+    # - if [ "$DEPLOY_AZURE" -eq 1 ]; then *azure; fi
+    # - if [ "$DEPLOY_GCP" -eq 1 ]; then *gcp; fi
+    - gcloud --quiet components update
+    - echo ${GCP_CI_SERVICE_ACCOUNT} | gcloud auth activate-service-account --key-file=-
+    - gcloud --quiet config set project ${GCP_PROJECT_ID}
     # deploy new image!
     - kubectl -n default rollout restart deployment/files-svc
