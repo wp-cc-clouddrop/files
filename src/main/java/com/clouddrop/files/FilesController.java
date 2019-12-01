@@ -44,10 +44,10 @@ public class FilesController {
     public FilesController() {
         String env = System.getenv("CLUSTER_ENV");
         log.debug("CLUSTER_ENV: " + env);
-        if(env == "azure"){
+        if(env.equals("azure")){
             log.debug("Using FilesAzureStorage");
             fs = new FilesAzureStorage();
-        }else if (env == "gcp") {
+        }else if (env.equals("gcp")) {
             log.debug("Using FilesGoogleStorage");
             fs = new FilesGoogleStorage();
         }
