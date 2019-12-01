@@ -1,12 +1,21 @@
 package com.clouddrop.files;
 
+import com.clouddrop.files.services.PicCloudVision;
+import com.clouddrop.files.services.TextCloudEntity;
 import com.google.common.collect.Lists;
+
+import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List.*;
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ComputeEngineCredentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.*;
+import com.microsoft.azure.storage.StorageException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,9 +28,14 @@ import java.util.*;
 
 public class FilesGoogleStorage implements IFilesAdapter {
 
+    private static Logger log = LoggerFactory.getLogger(FilesGoogleStorage.class);
+
     private Storage _storage;
     private Bucket _bucket;
     private String _bucketName;
+    private PicCloudVision _pcv;
+    private TextCloudEntity _tce;
+
 
     public FilesGoogleStorage(String jsonPath){
         // Explicitly request service account credentials from the compute engine instance.
@@ -44,6 +58,10 @@ public class FilesGoogleStorage implements IFilesAdapter {
         if(getBucket() == null){
             setBucket(getStorage().create(BucketInfo.of(getBucketName())));
         }
+
+        _pcv = new PicCloudVision();
+        _tce = new TextCloudEntity();
+
     }
 
     public FilesGoogleStorage(){
@@ -101,8 +119,40 @@ public class FilesGoogleStorage implements IFilesAdapter {
 
         Blob blob = getStorage().get(blobId);
 
+        if(!blob.exists()){
+            log.error("File does not exist. username: " + username + " filename: " + filename, new Exception());
+            return false;
+        }
+
         Map<String,String> metadata = blob.getMetadata();
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("text/plain").setMetadata(metadata).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)/*.setContentType("text/plain")*/.setMetadata(metadata).build();
+
+        // extract and set metadata
+        String type = metadata.get("type");
+        String tags = metadata.get("tags");
+        switch (type){
+            case ".png":
+            case ".jpg":
+                tags += _pcv.getMetadata(data);
+                break;
+            case  ".txt":
+                String textfileAsString = new String(data);
+                log.debug("pre metadataextr with: " + textfileAsString);
+                tags += _tce.getMetadata(textfileAsString);
+                log.debug("post metadataextr result: " + tags);
+                break;
+            default: log.debug("Type: " + type + " is not supported for AI metadata extraction");
+        }
+        metadata.put("tags",tags);
+
+        // Update lastModified
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        metadata.put("lastModified", dtf.format(now));
+
+        // log metadata content
+        log.debug("metadata content: " + metadata.toString());
+
         try(WriteChannel wc = getStorage().writer(blobInfo)){
             try{
                 wc.write(ByteBuffer.wrap(data));
@@ -114,6 +164,7 @@ public class FilesGoogleStorage implements IFilesAdapter {
             e.printStackTrace();
             resu = false;
         }
+
         return resu;
     }
 
