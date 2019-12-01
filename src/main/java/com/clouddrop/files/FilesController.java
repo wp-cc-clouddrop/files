@@ -41,11 +41,16 @@ public class FilesController {
     private IFilesAdapter fs;
     private MetadataService service;
 
-    public FilesController(IFilesAdapter filesAdapter) {
-        if(filesAdapter instanceof FilesAzureStorage){
+    public FilesController() {
+        String env = System.getenv("CLUSTER_ENV");
+        if(env == "azure"){
             fs = new FilesAzureStorage();
-        }else{
+        }else if (env == "gcp") {
             fs = new FilesGoogleStorage();
+        }
+        else {
+            log.error("CLUSTER_ENV not defined/unknown. Possible values are 'gcp' or 'azure'", new IllegalArgumentException());
+            System.exit(1);
         }
 
         service = new MetadataService();
