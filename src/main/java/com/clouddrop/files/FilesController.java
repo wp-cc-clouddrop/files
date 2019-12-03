@@ -45,10 +45,16 @@ public class FilesController {
         String env = System.getenv("CLUSTER_ENV");
         log.debug("CLUSTER_ENV: " + env);
         if(env.equals("azure")){
-            log.debug("Using FilesAzureStorage");
+            log.debug("Using FilesAzureStorage" );
             fs = new FilesAzureStorage();
         }else if (env.equals("gcp")) {
             log.debug("Using FilesGoogleStorage");
+            if(System.getenv("GOOGLE_APPLICATION_CREDENTIALS") == null){
+                log.error("GOOGLE_APPLICATION_CREDENTIALS not defined");
+                System.exit(1);
+            }else{
+                log.debug("Google Credential is: "+System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
+            }
             fs = new FilesGoogleStorage();
         }
         else {
