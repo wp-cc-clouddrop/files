@@ -49,12 +49,6 @@ public class FilesController {
             fs = new FilesAzureStorage();
         }else if (env.equals("gcp")) {
             log.debug("Using FilesGoogleStorage");
-            if(System.getenv("GOOGLE_APPLICATION_CREDENTIALS") == null){
-                log.error("GOOGLE_APPLICATION_CREDENTIALS not defined");
-                System.exit(1);
-            }else{
-                log.debug("Google Credential is: "+System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
-            }
             String json = System.getenv("GCP_STORAGE_CREDENTIAL_JSON");
             if( json == null){
                 log.error("GCP_STORAGE_CREDENTIAL_JSON not defined");
