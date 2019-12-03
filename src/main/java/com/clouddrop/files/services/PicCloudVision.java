@@ -37,10 +37,11 @@ public class PicCloudVision {
                     ImageAnnotatorSettings.newBuilder()
                             .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
                             .build();
-            // Instantiates a client
             _vision = ImageAnnotatorClient.create(imageAnnotatorSettings);
+            // _vision = ImageAnnotatorClient.create();
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
