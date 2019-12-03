@@ -55,7 +55,12 @@ public class FilesController {
             }else{
                 log.debug("Google Credential is: "+System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
             }
-            fs = new FilesGoogleStorage();
+            String json = System.getenv("GCP_STORAGE_CREDENTIAL_JSON");
+            if( json == null){
+                log.error("GCP_STORAGE_CREDENTIAL_JSON not defined");
+                System.exit(1);
+            }
+            fs = new FilesGoogleStorage(json);
         }
         else {
             log.error("CLUSTER_ENV not defined/unknown. Possible values are 'gcp' or 'azure'", new IllegalArgumentException());
