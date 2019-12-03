@@ -59,8 +59,8 @@ public class FilesGoogleStorage implements IFilesAdapter {
             setBucket(getStorage().create(BucketInfo.of(getBucketName())));
         }
 
-        _pcv = new PicCloudVision();
-        _tce = new TextCloudEntity();
+        _pcv = new PicCloudVision(jsonPath);
+        _tce = new TextCloudEntity(jsonPath);
 
     }
 

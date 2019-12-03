@@ -26,12 +26,16 @@ public class PicCloudVision {
         }
     }
 
-    /*public PicCloudVision(String jsonPath){
+    public PicCloudVision(String jsonPath){
 
+        GoogleCredentials credentials = null;
         try {
+            credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
+                    .createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+
             ImageAnnotatorSettings imageAnnotatorSettings =
                     ImageAnnotatorSettings.newBuilder()
-                            .setCredentialsProvider(FixedCredentialsProvider.create())
+                            .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
                             .build();
             // Instantiates a client
             _vision = ImageAnnotatorClient.create(imageAnnotatorSettings);
@@ -39,7 +43,7 @@ public class PicCloudVision {
             e.printStackTrace();
         }
     }
-*/
+
 
     public String getMetadata(byte[] picture){
         String metaData = TagImage(_vision,picture);

@@ -1,7 +1,10 @@
 package com.clouddrop.files.services;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import com.google.api.gax.core.FixedCredentialsProvider;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.language.v1.AnalyzeEntitiesRequest;
 import com.google.cloud.language.v1.AnalyzeEntitiesResponse;
 import com.google.cloud.language.v1.Document;
@@ -10,6 +13,7 @@ import com.google.cloud.language.v1.EncodingType;
 import com.google.cloud.language.v1.Entity;
 import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.cloud.language.v1.LanguageServiceSettings;
+import com.google.common.collect.Lists;
 
 public class TextCloudEntity {
 
@@ -27,11 +31,16 @@ public class TextCloudEntity {
 		}
 	}
 
-	public TextCloudEntity(String endpoint) 
+	public TextCloudEntity(String jsonPath)
 	{
+		GoogleCredentials credentials = null;
 		try {
+
+			credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath))
+					.createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+
 			LanguageServiceSettings settings = LanguageServiceSettings.newBuilder()
-					.setEndpoint(endpoint)
+					.setCredentialsProvider(FixedCredentialsProvider.create(credentials))
 					.build();
 			_client = LanguageServiceClient.create(settings);
 
