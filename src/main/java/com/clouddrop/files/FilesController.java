@@ -50,11 +50,11 @@ public class FilesController {
         }else if (env.equals("gcp")) {
             log.debug("Using FilesGoogleStorage");
             String json = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
-            if( json == null){
+            if (json == null){
                 log.error("GOOGLE_APPLICATION_CREDENTIALS not defined");
                 System.exit(1);
             }
-            fs = new FilesGoogleStorage(json);
+            fs = new FilesGoogleStorage();
         }
         else {
             log.error("CLUSTER_ENV not defined/unknown. Possible values are 'gcp' or 'azure'", new IllegalArgumentException());
