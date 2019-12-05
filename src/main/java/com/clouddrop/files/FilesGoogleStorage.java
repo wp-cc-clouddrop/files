@@ -224,6 +224,11 @@ public class FilesGoogleStorage implements IFilesAdapter {
         List<String> results = new ArrayList<>();
         Page<Blob> blobs = getBucket().list();
         for (Blob blob : blobs.iterateAll()) {
+            // get file only from this username
+            int value = blob.getName().indexOf(username);
+            if(value == -1){
+                continue;
+            }
 
             Map<String,String> metaData = blob.getMetadata();
 
