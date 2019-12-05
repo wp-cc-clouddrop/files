@@ -76,6 +76,9 @@ public class FilesGoogleStorage implements IFilesAdapter {
         if(getBucket() == null){
             setBucket(getStorage().create(BucketInfo.of(getBucketName())));
         }
+
+        _pcv = new PicCloudVision();
+        _tce = new TextCloudEntity();
     }
 
     public Storage getStorage() {
@@ -124,7 +127,7 @@ public class FilesGoogleStorage implements IFilesAdapter {
             return false;
         }
 
-        Map<String,String> metadata = blob.getMetadata();
+        HashMap<String,String> metadata = new HashMap<>(blob.getMetadata());
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)/*.setContentType("text/plain")*/.setMetadata(metadata).build();
 
         // extract and set metadata

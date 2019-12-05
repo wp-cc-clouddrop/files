@@ -1,9 +1,9 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:11
 # uncomment if need write to filesystem
 # VOLUME /tmp
 
 # fix for google cloud vision issue (https://github.com/grpc/grpc-java/issues/5655)
-RUN apk update && apk add libc6-compat
+# RUN apk update && apk add libc6-compat
 
 ARG JAR_FILE=target/files-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
