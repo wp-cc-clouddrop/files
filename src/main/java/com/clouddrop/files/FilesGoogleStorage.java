@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List.*;
 import com.google.api.gax.paging.Page;
+import com.google.api.gax.rpc.InvalidArgumentException;
 import com.google.auth.oauth2.ComputeEngineCredentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.WriteChannel;
@@ -128,7 +129,6 @@ public class FilesGoogleStorage implements IFilesAdapter {
         }
 
         HashMap<String,String> metadata = new HashMap<>(blob.getMetadata());
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)/*.setContentType("text/plain")*/.setMetadata(metadata).build();
 
         // extract and set metadata
         String type = metadata.get("type");
@@ -155,6 +155,7 @@ public class FilesGoogleStorage implements IFilesAdapter {
 
         // log metadata content
         log.debug("metadata content: " + metadata.toString());
+        Blob blobInfo = getStorage().update(BlobInfo.newBuilder(blobId).setMetadata(metadata).build());
 
         try(WriteChannel wc = getStorage().writer(blobInfo)){
             try{

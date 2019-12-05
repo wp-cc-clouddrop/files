@@ -62,7 +62,7 @@ public class TextCloudEntity {
 		String resultString = null;
 
 		Document doc = Document.newBuilder()
-				.setContent(text)  
+				.setContent(text)
 				.setType(Type.PLAIN_TEXT)
 				.build();
 		AnalyzeEntitiesRequest request = AnalyzeEntitiesRequest.newBuilder()
@@ -73,10 +73,11 @@ public class TextCloudEntity {
 		AnalyzeEntitiesResponse response = _client.analyzeEntities(request);
 
 		for (Entity entity : response.getEntitiesList()) {
-			resultString+=entity.getName()+",";
+			resultString += entity.getName().toLowerCase() + ",";
 		}
 
-		return resultString;
+        // remove last comma
+        return resultString.substring(0,resultString.length());
 	}
 
 }

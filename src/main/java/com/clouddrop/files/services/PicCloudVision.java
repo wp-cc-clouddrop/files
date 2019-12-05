@@ -8,6 +8,9 @@ import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Descriptors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 public class PicCloudVision {
+
+    private static Logger log = LoggerFactory.getLogger(PicCloudVision.class);
+
     private ImageAnnotatorClient _vision;
 
     public PicCloudVision(){
@@ -69,16 +75,17 @@ public class PicCloudVision {
         // Performs label detection on the image file
         BatchAnnotateImagesResponse response = vision.batchAnnotateImages(requests);
         List<AnnotateImageResponse> responses = response.getResponsesList();
-        Map<Descriptors.FieldDescriptor,Object> resultMap = null;
         for (AnnotateImageResponse res : responses) {
             // For full list of available annotations, see http://g.co/cloud/vision/docs
+            log.debug("VISION API response: " + res.getLabelAnnotationsList());
             for (EntityAnnotation annotation : res.getLabelAnnotationsList()) {
-                resultMap = annotation.getAllFields();
+                String description = annotation.getDescription().toLowerCase();
+                log.debug(description);
+                resultString += description + ",";
             }
         }
-        for(Object o : resultMap.keySet()){
-            resultString+=o.toString()+",";
-        }
-        return resultString;
+
+        // remove last comma
+        return resultString.substring(0,resultString.length());
     }
 }
