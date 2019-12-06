@@ -59,7 +59,7 @@ public class TextCloudEntity {
 
 	// Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
 	private String tagText(String text) {
-		String resultString = null;
+		String resultString = "";
 
 		Document doc = Document.newBuilder()
 				.setContent(text)
